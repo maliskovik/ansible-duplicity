@@ -1,0 +1,50 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+#This script dumps a local mongo database and backs it up.
+#
+##############################---INCLUDES---####################################
+
+. ./backupConfig
+. ./runDuplicity
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+#Mising variables are included from backupConfig
+DESTINATION_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+DESTINATION="${DESTINATION_DIRECTORY}/${DATABASE}"
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function dump() {
+    if  [ -e ${DESTINATION_DIRECTORY} ]
+    then
+        rm -fr ${DESTINATION_DIRECTORY}
+    fi
+
+    mkdir -p ${DESTINATION_DIRECTORY}
+    mongodump \
+        -h 127.0.0.1 \
+        -d ${DATABASE} \
+         --quiet \
+        --out ${DESTINATION}
+}
+
+function runBackup() {
+    dump
+    runDuplicity
+    removeOldBackups
+}
+
+################################################################################

@@ -1,0 +1,58 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+#This script dumps the database from a elasticsearch docker container
+#to the destonation file.
+#
+##############################---INCLUDES---####################################
+
+. ./backupConfig
+. ./runDuplicity
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+DOCKER_IMAGE="kendu/projectbuilder:elasticdump"
+DESTINATION_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function connectAndDump() {
+    if  [ -e ${DESTINATION_DIRECTORY} ]
+    then
+        rm -fr ${DESTINATION_DIRECTORY}
+    fi
+
+    mkdir -p "${DESTINATION_DIRECTORY}"
+    docker run --rm \
+      -v ${DESTINATION_DIRECTORY}:${DESTINATION_DIRECTORY} \
+      --link "${CONTAINER}:es" \
+      "${DOCKER_IMAGE}" \
+      bash -c \
+            "elasticdump \
+              --input=http://es:9200/${ES_INDEX} \
+              --output=${DESTINATION_DIRECTORY}/${ES_INDEX}-mapping.json \
+              --type=mapping >> /dev/null
+            elasticdump \
+              --input=http://es:9200/${ES_INDEX} \
+              --output=${DESTINATION_DIRECTORY}/${ES_INDEX}-data.json \
+              --type=data >> /dev/null"
+}
+
+function runBackup() {
+    connectAndDump
+    runDuplicity
+    removeOldBackups
+}
+
+################################################################################

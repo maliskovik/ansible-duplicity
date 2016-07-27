@@ -1,0 +1,63 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+# Runs duplicity from a docker container linked to the container whose files we
+# want to back up
+#
+##############################---VARIABLES---###################################
+
+HOSTNAME="duplicityhost"
+DIMAGE="kendu/duplicity"
+
+################################################################################
+
+##############################---INCLUDES---####################################
+
+. ./backupConfig
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function runDuplicity() {
+
+    echo "> Started the backup of ${BACKUP_NAME}" >> "${LOGFILE}"
+    docker run \
+        --rm \
+        -h ${HOSTNAME} \
+        -v /root/.ssh:/root/.ssh \
+        -v /root/.cache/duplicity:/root/.cache/duplicity \
+        --volumes-from "${CONTAINER}" \
+        ${DIMAGE} \
+        bash -c "duplicity --full-if-older-than ${FULL_BACKUP_INTERVAL} \
+        --no-encryption \
+        ${DESTINATION_DIRECTORY} \
+        ${SFTPLINK}" >> "${LOGFILE}"
+}
+
+function removeOldBackups() {
+    docker run \
+        --rm \
+        -h ${HOSTNAME} \
+        -v /root/.ssh:/root/.ssh \
+        -v /root/.cache/duplicity:/root/.cache/duplicity \
+        --volumes-from "${CONTAINER}" \
+        ${DIMAGE} \
+        bash -c "duplicity remove-all-but-n-full ${SETS_TO_KEEP} \
+        --no-encryption \
+        ${SFTPLINK}" >> "${LOGFILE}"
+}
+
+function runBackup() {
+    runDuplicity
+    removeOldBackups
+}
+
+################################################################################

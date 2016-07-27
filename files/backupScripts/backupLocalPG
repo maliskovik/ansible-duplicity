@@ -1,0 +1,51 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+#This script dumps the database from a postgresql docker container
+#to the destonation file.
+#
+##############################---INCLUDES---####################################
+
+. ./backupConfig
+. ./runDuplicity
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+DBUSER="postgres"
+
+#Mising variables are included from backupConfig
+DESTINATION_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+DESTINATION="${DESTINATION_DIRECTORY}/${DATABASE}.sql"
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function connectAndDump() {
+    if  [ -e ${DESTINATION_DIRECTORY} ]
+    then
+        rm -fr ${DESTINATION_DIRECTORY}
+    fi
+
+    mkdir -p ${DESTINATION_DIRECTORY}
+    pg_dump \
+        -U ${DBUSER} \
+        ${DATABASE} > ${DESTINATION}
+}
+
+function runBackup() {
+    connectAndDump
+    runDuplicity
+    removeOldBackups
+}
+
+################################################################################

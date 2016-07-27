@@ -1,0 +1,29 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+# DockerElasticsearch profile
+#
+##############################---VARIABLES---###################################
+
+#Things to set:
+BACKUP_NAME="<Backup name>"
+FULL_BACKUP_INTERVAL="<Interval of full backups>"
+BACKUP_INTERVAL=<Interval of backups>
+SETS_TO_KEEP=<Number of sets to keep>
+CONTAINER="<Name of container to backup>"
+ES_INDEX="<Elasticsearch index we want to backup>"
+
+################################################################################
+
+###############################---EXECUTION---##################################
+
+. ./backupDockerElasticsearch
+
+################################################################################

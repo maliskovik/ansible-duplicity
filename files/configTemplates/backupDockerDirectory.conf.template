@@ -1,0 +1,29 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+# Backup Docker directory profile
+#
+##############################---VARIABLES---###################################
+
+#Things to set:
+BACKUP_NAME="<Backup name>"
+DESTINATION_DIRECTORY="<Directory to backup>"
+FULL_BACKUP_INTERVAL="<Interval of full backups>"
+BACKUP_INTERVAL=<Interval of backups>
+SETS_TO_KEEP=<Number of sets to keep>
+CONTAINER="<Name of container to backup>"
+
+################################################################################
+
+##############################---INCLUDES---####################################
+
+. ./backupDockerDirectory
+
+################################################################################

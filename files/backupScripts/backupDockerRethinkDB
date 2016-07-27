@@ -1,0 +1,56 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+# This script dumps the rethinkDB inside the container which is running it
+# and transfers the file to the detination on the host. The dump is then backed
+# up with duplicity.
+#
+##############################---INCLUDES---####################################
+
+. ./backupConfig
+. ./runDuplicity
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+DUMPFILE="dump.tar.gz"
+DESTINATION_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function dumpRethinkDb() {
+    if  [ -e ${DESTINATION_DIRECTORY} ]
+    then
+        rm -fr ${DESTINATION_DIRECTORY}
+    fi
+
+    mkdir -p ${DESTINATION_DIRECTORY}
+    cd ${DESTINATION_DIRECTORY}
+    docker exec ${CONTAINER} bash -c \
+        "rm -f /tmp/${DUMPFILE}; rethinkdb dump -f /tmp/${DUMPFILE}" >> \
+        /dev/null
+    docker exec ${CONTAINER} bash -c "cat /tmp/${DUMPFILE}" > ${DUMPFILE}
+    tar -zxvf ${DUMPFILE} >> /dev/null
+    rm ${DUMPFILE}
+    mv rethinkdb_dump_*/* .
+    rm -fr rethinkdb_dump_*
+    cd ${BACKUPDIR}
+}
+
+function runBackup() {
+    dumpRethinkDb
+    runDuplicity
+    removeOldBackups
+}
+
+################################################################################

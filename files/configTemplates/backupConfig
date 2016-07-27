@@ -1,0 +1,38 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+#Server specific information to connect to backup location
+#It is presumed that the backup location is properly configured, that is:
+#It is configured with the client's public key
+#
+##############################---VARIABLES---###################################
+
+#Login name for backup server
+USERNAME=<username>
+#Backup server name
+SERVER=<server>
+#Location of backup directory.
+LOGDIR="/var/log/backup"
+#Backup directory - here
+BACKUPDIR=$(pwd)
+#Duplicity log file
+DUPLICITYLOG="/var/log/duplicity.log"
+
+#Consequential variables
+LOGFILE="${LOGDIR}/${BACKUP_NAME}.log"
+SFTPLINK="sftp://${USERNAME}@${SERVER}/${BACKUP_NAME}"
+
+################################################################################
+
+###############################---EXECUTION---##################################
+
+mkdir -p ${LOGDIR}
+
+################################################################################

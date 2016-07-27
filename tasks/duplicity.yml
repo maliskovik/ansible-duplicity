@@ -1,0 +1,48 @@
+- name: Install duplicity
+  apt:
+    name: "{{ item }}"
+    state: latest
+    force: yes
+  with_items:
+    - duplicity
+    - python-paramiko
+
+- name: Create backup directory
+  file:
+    path: "{{ backup_directory }}"
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+- name: Server config
+  template:
+    src: backup_config
+    dest: "{{ backup_directory }}/backupConfig"
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Copy scripts
+  copy:
+    src: backupScripts/
+    dest: "{{ backup_directory }}"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Set backups
+  copy:
+    src: "../configs/{{ inventory_hostname }}/duplicity_configs/"
+    dest: "{{ backup_directory }}"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Add duplicity cronjob
+  template:
+    src: cron_job
+    dest: /etc/cron.d/duplicity
+    mode: 0755
+    owner: root
+    group: root

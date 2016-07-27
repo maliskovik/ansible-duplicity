@@ -1,0 +1,4 @@
+---
+# Main role tasks file
+
+- include: duplicity.yml

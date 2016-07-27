@@ -1,0 +1,48 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+# Due to the possible problems that may arrise when running several backups
+# at the same time, this script acts as the scheduler and is run every hour.
+# Scripts are executed based on their backup interval.
+#
+###############################---WORKDIR---####################################
+
+cd $( dirname $0 )
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+BASEDIR=$(pwd)
+
+################################################################################
+
+###############################---EXECUTION---##################################
+
+cd ${BASEDIR}
+HOURS=${1:-$(date +%-k )}
+: ${BACKUP_INTERVAL:=1}
+
+for backup in *.conf
+do
+    . "./${backup}"
+    if [ ${BACKUP_INTERVAL} == 0 ]
+        then
+        BACKUP_INTERVAL=1
+    fi
+
+    if [  $(( HOURS % BACKUP_INTERVAL )) == 0 ]
+        then
+        runBackup
+    fi
+    cd ${BASEDIR}
+done
+
+################################################################################

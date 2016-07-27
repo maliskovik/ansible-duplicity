@@ -1,0 +1,72 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+# Dumps mysql database and runs duplicity backup on it.
+#
+##############################---INCLUDES---####################################
+
+. ./backupConfig
+. ./runDuplicity
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+DBHOST="127.0.0.1"
+
+#Missing variables are included from backupConfig
+DESTINATION_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+DESTINATION="${DESTINATION_DIRECTORY}/${DATABASE}.sql"
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function dumpMysql() {
+    if  [ -e ${DESTINATION_DIRECTORY} ]
+    then
+        rm -fr ${DESTINATION_DIRECTORY}
+    fi
+
+    mkdir -p ${DESTINATION_DIRECTORY}
+
+    #Dump schema
+    mysqldump \
+        --no-data \
+        --skip-triggers \
+        --skip-routines \
+        --host "${DBHOST}" \
+        "${DATABASE}" > "${DESTINATION_DIRECTORY}/db-schema-dump.sql"
+
+    #Dump processes
+    mysqldump \
+        --no-data \
+        --no-create-info \
+        --triggers \
+        --routines \
+        --skip-routines \
+        --host "${DBHOST}" \
+        "${DATABASE}" > "${DESTINATION_DIRECTORY}/db-proc-dump.sql"
+
+    #Dump data
+    mysqldump \
+        --no-create-info \
+        --skip-triggers \
+        --host "${DBHOST}" \
+        "${DATABASE}" > "${DESTINATION_DIRECTORY}/db-data-dump.sql"
+}
+
+function runBackup() {
+    dumpMysql
+    runDuplicity
+    removeOldBackups
+}
+
+################################################################################

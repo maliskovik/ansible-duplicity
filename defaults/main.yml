@@ -1,0 +1,7 @@
+backup_directory: /opt/backup
+duplicity_sftp_username: ""
+duplicity_sftp_port: "22"
+duplicity_sftp_destination: ""
+duplicity_log_directory: /var/log/backup
+duplicity_log: /var/log/duplicity.log
+duplicity_mail_to: ""

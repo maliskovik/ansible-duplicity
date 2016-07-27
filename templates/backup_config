@@ -1,0 +1,40 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+#Server specific information to connect to backup location
+#It is presumed that the backup location is properly configured, that is:
+#It is configured with the client's public key
+#
+##############################---VARIABLES---###################################
+
+#Login name for backup server
+USERNAME="{{ duplicity_sftp_username }}"
+#Backup server name
+SERVER="{{ duplicity_sftp_destination }}"
+#Backup server port
+PORT="{{ duplicity_sftp_port }}"
+#Location of backup directory.
+LOGDIR="{{ duplicity_log_directory }}"
+#Backup directory - here
+BACKUPDIR="{{ backup_directory }}"
+#Duplicity log file
+DUPLICITYLOG="{{ duplicity_log }}"
+
+#Consequential variables
+LOGFILE="${LOGDIR}/${BACKUP_NAME}.log"
+SFTPLINK="sftp://${USERNAME}@${SERVER}:${PORT}/${BACKUP_NAME}"
+
+################################################################################
+
+###############################---EXECUTION---##################################
+
+mkdir -p ${LOGDIR}
+
+################################################################################
