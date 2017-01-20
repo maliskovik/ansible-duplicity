@@ -33,7 +33,7 @@
 
 - name: Set backups
   copy:
-    src: "../configs/{{ inventory_hostname }}/duplicity_configs/"
+    src: "configs/{{ inventory_hostname }}/duplicity_configs/"
     dest: "{{ backup_directory }}"
     owner: root
     group: root

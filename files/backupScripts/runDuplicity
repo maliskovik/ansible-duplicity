@@ -22,7 +22,6 @@ runDuplicity() {
     echo "> Started the backup of ${BACKUP_NAME}" >> "${LOGFILE}"
     duplicity --full-if-older-than "${FULL_BACKUP_INTERVAL}" \
         --no-encryption \
-        --ssh-backend pexpect \
         --log-file ${DUPLICITYLOG} \
         "${DESTINATION_DIRECTORY}" \
         "${SFTPLINK}" >> "${LOGFILE}"
@@ -31,7 +30,6 @@ runDuplicity() {
 removeOldBackups() {
     duplicity remove-all-but-n-full ${SETS_TO_KEEP} \
         --no-encryption \
-        --ssh-backend pexpect \
         --force \
         --log-file ${DUPLICITYLOG} \
         ${SFTPLINK} >> "${LOGFILE}"
