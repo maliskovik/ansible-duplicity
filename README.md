@@ -11,6 +11,7 @@ The backups configs should be placed in files/backupConfigs/<hostname>
 * backup_directory - directory with all the backup configs
 * duplicity_log_directory - where logs of individual backups are stored
 * duplicity_log: /var/log/duplicity.log - duplicity log
+* duplicity_local_backup_dir - local backup destination - if this is set, remote settings are ignored.
 
 # Backup scripts
 

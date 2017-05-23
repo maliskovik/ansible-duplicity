@@ -14,6 +14,10 @@
 #
 ##############################---VARIABLES---###################################
 
+{% if duplicity_local_backup_dir is defined %}
+#Local backup destination directory
+LOCAL_BACKUP_DIR="{{ duplicity_local_backup_dir }}"
+{% else %}
 #Login name for backup server
 USERNAME="{{ duplicity_sftp_username }}"
 #Backup server name
@@ -21,15 +25,20 @@ SERVER="{{ duplicity_sftp_destination }}"
 #Backup server port
 PORT="{{ duplicity_sftp_port }}"
 #Location of backup directory.
+{% endif %}
 LOGDIR="{{ duplicity_log_directory }}"
 #Backup directory - here
 BACKUPDIR="{{ backup_directory }}"
 #Duplicity log file
 DUPLICITYLOG="{{ duplicity_log }}"
 
-#Consequential variables
+#Derived variables
 LOGFILE="${LOGDIR}/${BACKUP_NAME}.log"
-SFTPLINK="sftp://${USERNAME}@${SERVER}:${PORT}/${BACKUP_NAME}"
+{% if duplicity_local_backup_dir is defined %}
+DESTINATION_URL="FILE://${LOCAL_BACKUP_DIR}/${BACKUP_NAME}"
+{% else %}
+DESTINATION_URL="sftp://${USERNAME}@${SERVER}:${PORT}/${BACKUP_NAME}"
+{% endif %}
 
 ################################################################################
 

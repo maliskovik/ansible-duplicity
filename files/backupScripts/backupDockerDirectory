@@ -39,7 +39,7 @@ function runDuplicity() {
         bash -c "duplicity --full-if-older-than ${FULL_BACKUP_INTERVAL} \
         --no-encryption \
         ${DESTINATION_DIRECTORY} \
-        ${SFTPLINK}" >> "${LOGFILE}"
+        ${DESTINATION_URL}" >> "${LOGFILE}"
 }
 
 function removeOldBackups() {
@@ -52,7 +52,7 @@ function removeOldBackups() {
         ${DIMAGE} \
         bash -c "duplicity remove-all-but-n-full ${SETS_TO_KEEP} \
         --no-encryption \
-        ${SFTPLINK}" >> "${LOGFILE}"
+        ${DESTINATION_URL}" >> "${LOGFILE}"
 }
 
 function runBackup() {

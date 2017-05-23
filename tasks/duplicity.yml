@@ -1,4 +1,4 @@
-- name: Install duplicity
+- name: Install duplicity - debian
   apt:
     name: "{{ item }}"
     state: latest
@@ -6,6 +6,17 @@
   with_items:
     - duplicity
     - python-paramiko
+  when: ansible_os_family == "Debian"
+
+- name: Install duplicity -arch
+  pacman:
+    name: "{{ item }}"
+    state: latest
+    force: yes
+  with_items:
+    - duplicity
+    - python-paramiko
+  when: ansible_os_family == "Archlinux"
 
 - name: Create backup directory
   file:

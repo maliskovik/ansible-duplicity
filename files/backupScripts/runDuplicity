@@ -19,12 +19,18 @@ runDuplicity() {
         exit 1
     fi
 
-    echo "> Started the backup of ${BACKUP_NAME}" >> "${LOGFILE}"
+    echo "################################################################################" >> "${LOGFILE}"
+    echo "# Started the backup of ${BACKUP_NAME}" >> "${LOGFILE}"
+    echo "" >> "${LOGFILE}"
+    echo "################################################################################" >> "${DUPLICITYLOG}"
+    echo "# Started the backup of ${BACKUP_NAME}" >> "${DUPLICITYLOG}"
+    echo "" >> "${DUPLICITYLOG}"
+
     duplicity --full-if-older-than "${FULL_BACKUP_INTERVAL}" \
         --no-encryption \
         --log-file ${DUPLICITYLOG} \
         "${DESTINATION_DIRECTORY}" \
-        "${SFTPLINK}" >> "${LOGFILE}"
+        "${DESTINATION_URL}" >> "${LOGFILE}"
 }
 
 removeOldBackups() {
@@ -32,7 +38,7 @@ removeOldBackups() {
         --no-encryption \
         --force \
         --log-file ${DUPLICITYLOG} \
-        ${SFTPLINK} >> "${LOGFILE}"
+        ${DESTINATION_URL} >> "${LOGFILE}"
 }
 
 ################################################################################

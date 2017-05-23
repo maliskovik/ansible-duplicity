@@ -27,7 +27,7 @@ DUPLICITYLOG="/var/log/duplicity.log"
 
 #Consequential variables
 LOGFILE="${LOGDIR}/${BACKUP_NAME}.log"
-SFTPLINK="sftp://${USERNAME}@${SERVER}/${BACKUP_NAME}"
+DESTINATION_URL="sftp://${USERNAME}@${SERVER}/${BACKUP_NAME}"
 
 ################################################################################
 
