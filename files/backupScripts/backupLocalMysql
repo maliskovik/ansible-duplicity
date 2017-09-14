@@ -19,8 +19,7 @@
 
 ##############################---VARIABLES---###################################
 
-DBHOST="127.0.0.1"
-
+: ${DBHOST:="127.0.0.1"}
 #Missing variables are included from backupConfig
 DESTINATION_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
 DESTINATION="${DESTINATION_DIRECTORY}/${DATABASE}.sql"
