@@ -22,20 +22,20 @@
 ##############################---VARIABLES---###################################
 
 DUMPFILE="dump.tar.gz"
-DESTINATION_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
 
 ################################################################################
 
 ##############################---FUNCTIONS---###################################
 
 function dumpRethinkDb() {
-    if  [ -e ${DESTINATION_DIRECTORY} ]
+    if  [ -e ${SOURCE_DIRECTORY} ]
     then
-        rm -fr ${DESTINATION_DIRECTORY}
+        rm -fr ${SOURCE_DIRECTORY}
     fi
 
-    mkdir -p ${DESTINATION_DIRECTORY}
-    cd ${DESTINATION_DIRECTORY}
+    mkdir -p ${SOURCE_DIRECTORY}
+    cd ${SOURCE_DIRECTORY}
     docker exec ${CONTAINER} bash -c \
         "rm -f /tmp/${DUMPFILE}; rethinkdb dump -f /tmp/${DUMPFILE}" >> \
         /dev/null

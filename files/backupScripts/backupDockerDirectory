@@ -38,7 +38,7 @@ function runDuplicity() {
         ${DIMAGE} \
         bash -c "duplicity --full-if-older-than ${FULL_BACKUP_INTERVAL} \
         --no-encryption \
-        ${DESTINATION_DIRECTORY} \
+        ${SOURCE_DIRECTORY} \
         ${DESTINATION_URL}" >> "${LOGFILE}"
 }
 

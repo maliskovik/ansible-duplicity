@@ -14,7 +14,7 @@
 
 #Things to set:
 BACKUP_NAME="<Backup name>"
-DESTINATION_DIRECTORY="<Directory to backup>"
+SOURCE_DIRECTORY="<Directory to backup>"
 FULL_BACKUP_INTERVAL="<Interval of full backups>"
 BACKUP_INTERVAL=<Interval of backups>
 SETS_TO_KEEP=<Number of sets to keep>

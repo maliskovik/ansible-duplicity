@@ -42,7 +42,7 @@ Following packages need to be installed
 ## Variables
 
 * BACKUP_NAME - string in snake case. Name of the backup.
-* DESTINATION_DIRECTORY - string - Path to the directory to backup.
+* SOURCE_DIRECTORY - string - Path to the directory to backup.
 * FULL_BACKUP_INTERVAL - duplicity argument. Define the interval in which to
 perform a full backup(start new backup chain). Examples: "1Y", "2M",10D.
 The string should be like defined in the duplicity man page:

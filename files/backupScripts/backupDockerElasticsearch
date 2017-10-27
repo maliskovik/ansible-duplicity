@@ -21,31 +21,31 @@
 ##############################---VARIABLES---###################################
 
 DOCKER_IMAGE="kendu/projectbuilder:elasticdump"
-DESTINATION_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
 
 ################################################################################
 
 ##############################---FUNCTIONS---###################################
 
 function connectAndDump() {
-    if  [ -e ${DESTINATION_DIRECTORY} ]
+    if  [ -e ${SOURCE_DIRECTORY} ]
     then
-        rm -fr ${DESTINATION_DIRECTORY}
+        rm -fr ${SOURCE_DIRECTORY}
     fi
 
-    mkdir -p "${DESTINATION_DIRECTORY}"
+    mkdir -p "${SOURCE_DIRECTORY}"
     docker run --rm \
-      -v ${DESTINATION_DIRECTORY}:${DESTINATION_DIRECTORY} \
+      -v ${SOURCE_DIRECTORY}:${SOURCE_DIRECTORY} \
       --link "${CONTAINER}:es" \
       "${DOCKER_IMAGE}" \
       bash -c \
             "elasticdump \
               --input=http://es:9200/${ES_INDEX} \
-              --output=${DESTINATION_DIRECTORY}/${ES_INDEX}-mapping.json \
+              --output=${SOURCE_DIRECTORY}/${ES_INDEX}-mapping.json \
               --type=mapping >> /dev/null
             elasticdump \
               --input=http://es:9200/${ES_INDEX} \
-              --output=${DESTINATION_DIRECTORY}/${ES_INDEX}-data.json \
+              --output=${SOURCE_DIRECTORY}/${ES_INDEX}-data.json \
               --type=data >> /dev/null"
 }
 

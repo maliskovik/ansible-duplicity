@@ -20,20 +20,20 @@
 ##############################---VARIABLES---###################################
 
 #Mising variables are included from backupConfig
-DESTINATION_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
-DESTINATION="${DESTINATION_DIRECTORY}/${DATABASE}"
+SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+DESTINATION="${SOURCE_DIRECTORY}/${DATABASE}"
 
 ################################################################################
 
 ##############################---FUNCTIONS---###################################
 
 function dump() {
-    if  [ -e ${DESTINATION_DIRECTORY} ]
+    if  [ -e ${SOURCE_DIRECTORY} ]
     then
-        rm -fr ${DESTINATION_DIRECTORY}
+        rm -fr ${SOURCE_DIRECTORY}
     fi
 
-    mkdir -p ${DESTINATION_DIRECTORY}
+    mkdir -p ${SOURCE_DIRECTORY}
     mongodump \
         -h 127.0.0.1 \
         -d ${DATABASE} \
