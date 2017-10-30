@@ -1,0 +1,46 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+#Prepares LDAP dump to backup.
+#
+##############################---INCLUDES---####################################
+
+. ./backupConfig
+. ./runDuplicity
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+#Mising variables are included from backupConfig
+SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+DESTINATION="${SOURCE_DIRECTORY}/dump.ldif"
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function LDump() {
+    if  [ -e ${SOURCE_DIRECTORY} ]
+    then
+        rm -fr ${SOURCE_DIRECTORY}
+    fi
+
+    mkdir -p ${SOURCE_DIRECTORY}
+    slapcat > "${DESTINATION}"
+}
+
+function runBackup() {
+    LDump
+    runDuplicity
+    removeOldBackups
+}
+
+################################################################################

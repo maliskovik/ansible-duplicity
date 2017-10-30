@@ -5,7 +5,12 @@
     force: yes
   with_items:
     - duplicity
-    - python-paramiko
+  when: ansible_os_family == "Debian"
+
+- name: Install python paramiko
+  pip:
+    name: paramiko
+    state: present
   when: ansible_os_family == "Debian"
 
 - name: Install duplicity -arch
