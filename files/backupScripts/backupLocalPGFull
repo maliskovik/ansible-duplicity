@@ -1,0 +1,48 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+# This script creates a full pg cluster dump to the destonation file.
+#
+##############################---INCLUDES---####################################
+
+. ./backupConfig
+. ./runDuplicity
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+DBUSER="postgres"
+
+#Mising variables are included from backupConfig
+SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+DESTINATION="${SOURCE_DIRECTORY}/dump.sql"
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function connectAndDump() {
+    if  [ -e ${SOURCE_DIRECTORY} ]
+    then
+        rm -fr ${SOURCE_DIRECTORY}
+    fi
+
+    mkdir -p ${SOURCE_DIRECTORY}
+    sudo -u ${DBUSER} pg_dumpall > ${DESTINATION}
+}
+
+function runBackup() {
+    connectAndDump
+    runDuplicity
+    removeOldBackups
+}
+
+################################################################################
