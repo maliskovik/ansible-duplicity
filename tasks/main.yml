@@ -2,3 +2,5 @@
 # Main role tasks file
 
 - include: duplicity.yml
+- include: backup_test.yml
+  when: duplicity_test_backups

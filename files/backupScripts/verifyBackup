@@ -48,11 +48,11 @@ function chackForBackup() {
       echo " ERROR: Backup directory does not exist ${SERVER}/${BACKUP_NAME}!"
       BACKUP_STATUS=2
     # Check if new backup exists
-    elif [[ -n $(ssh ${USERNAME}@${SERVER} "find ${BACKUP_NAME} -mtime 0") ]]
+  elif [[ -n $(ssh ${USERNAME}@${SERVER} "find ${BACKUP_NAME} -mtime 0") ]]
     then
-      echo " INFO: Backup for ${BACKUP_NAME}@${USERNAME} OK." >>/dev/null
+      echo " INFO: Backup for ${BACKUP_NAME}@${SERVER} OK." >>/dev/null
     else
-      echo " ERROR: Backup for ${BACKUP_NAME}@${USERNAME} NOT found!"
+      echo " ERROR: Backup for ${BACKUP_NAME}@${SERVER} NOT found!"
       BACKUP_STATUS=2
     fi
   done
