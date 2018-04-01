@@ -5,3 +5,4 @@ duplicity_sftp_destination: ""
 duplicity_log_directory: /var/log/backup
 duplicity_log: /var/log/duplicity.log
 duplicity_mail_to: ""
+duplicity_test_backups: False
