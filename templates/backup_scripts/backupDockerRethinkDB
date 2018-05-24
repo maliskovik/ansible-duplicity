@@ -8,49 +8,47 @@
 #                                                                              #
 ################################################################################
 #
-#This script dumps the database from a elasticsearch docker container
-#to the destonation file.
+# This script dumps the rethinkDB inside the container which is running it
+# and transfers the file to the detination on the host. The dump is then backed
+# up with duplicity.
 #
 ##############################---INCLUDES---####################################
 
-. ./backupConfig
+. "${BACKUP_BACKEND}.cf"
 . ./runDuplicity
 
 ################################################################################
 
 ##############################---VARIABLES---###################################
 
-DOCKER_IMAGE="kendu/projectbuilder:elasticdump"
+DUMPFILE="dump.tar.gz"
 SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
 
 ################################################################################
 
 ##############################---FUNCTIONS---###################################
 
-function connectAndDump() {
+function dumpRethinkDb() {
     if  [ -e ${SOURCE_DIRECTORY} ]
     then
         rm -fr ${SOURCE_DIRECTORY}
     fi
 
-    mkdir -p "${SOURCE_DIRECTORY}"
-    docker run --rm \
-      -v ${SOURCE_DIRECTORY}:${SOURCE_DIRECTORY} \
-      --link "${CONTAINER}:es" \
-      "${DOCKER_IMAGE}" \
-      bash -c \
-            "elasticdump \
-              --input=http://es:9200/${ES_INDEX} \
-              --output=${SOURCE_DIRECTORY}/${ES_INDEX}-mapping.json \
-              --type=mapping >> /dev/null
-            elasticdump \
-              --input=http://es:9200/${ES_INDEX} \
-              --output=${SOURCE_DIRECTORY}/${ES_INDEX}-data.json \
-              --type=data >> /dev/null"
+    mkdir -p ${SOURCE_DIRECTORY}
+    cd ${SOURCE_DIRECTORY}
+    docker exec ${CONTAINER} bash -c \
+        "rm -f /tmp/${DUMPFILE}; rethinkdb dump -f /tmp/${DUMPFILE}" >> \
+        /dev/null
+    docker exec ${CONTAINER} bash -c "cat /tmp/${DUMPFILE}" > ${DUMPFILE}
+    tar -zxvf ${DUMPFILE} >> /dev/null
+    rm ${DUMPFILE}
+    mv rethinkdb_dump_*/* .
+    rm -fr rethinkdb_dump_*
+    cd ${BACKUPDIR}
 }
 
 function runBackup() {
-    connectAndDump
+    dumpRethinkDb
     runDuplicity
     removeOldBackups
 }

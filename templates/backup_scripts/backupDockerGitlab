@@ -12,7 +12,7 @@
 #
 ##############################---INCLUDES---####################################
 
-. ./backupConfig
+. "${BACKUP_BACKEND}.cf"
 . ./runDuplicity
 
 ################################################################################
@@ -20,8 +20,13 @@
 ##############################---FUNCTIONS---###################################
 
 function runBackup() {
-    runDuplicity
-    removeOldBackups
+  gitlabBackup
+  runDuplicity
+  removeOldBackups
+}
+
+function gitlabBackup() {
+  docker exec "${DOCKER_CONTAINER}" bash -c "gitlab-rake gitlab:backup:create SKIP=repositories" >> /dev/null
 }
 
 ################################################################################

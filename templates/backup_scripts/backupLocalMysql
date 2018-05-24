@@ -8,45 +8,62 @@
 #                                                                              #
 ################################################################################
 #
-#This script dumps the database from a postgresql docker container
-#to the destonation file.
+# Dumps mysql database and runs duplicity backup on it.
 #
 ##############################---INCLUDES---####################################
 
-. ./backupConfig
+. "${BACKUP_BACKEND}.cf"
 . ./runDuplicity
 
 ################################################################################
 
 ##############################---VARIABLES---###################################
 
-: ${DBUSER:="postgres"}
-
-#Mising variables are included from backupConfig
+: ${DBHOST:="127.0.0.1"}
+#Missing variables are included from backupConfig
 SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
 DESTINATION="${SOURCE_DIRECTORY}/${DATABASE}.sql"
-: ${PGDUMP_BINARY:="pg_dump"}
-: ${DB_HOST:="localhsot"}
 
 ################################################################################
 
 ##############################---FUNCTIONS---###################################
 
-function connectAndDump() {
+function dumpMysql() {
     if  [ -e ${SOURCE_DIRECTORY} ]
     then
         rm -fr ${SOURCE_DIRECTORY}
     fi
 
     mkdir -p ${SOURCE_DIRECTORY}
-    sudo -u ${DBUSER} \
-        ${PGDUMP_BINARY} \
-        -h ${DB_HOST} \
-        ${DATABASE} > ${DESTINATION}
+
+    #Dump schema
+    mysqldump \
+        --no-data \
+        --skip-triggers \
+        --skip-routines \
+        --host "${DBHOST}" \
+        "${DATABASE}" > "${SOURCE_DIRECTORY}/db-schema-dump.sql"
+
+    #Dump processes
+    mysqldump \
+        --no-data \
+        --no-create-info \
+        --triggers \
+        --routines \
+        --skip-routines \
+        --host "${DBHOST}" \
+        "${DATABASE}" > "${SOURCE_DIRECTORY}/db-proc-dump.sql"
+
+    #Dump data
+    mysqldump \
+        --no-create-info \
+        --skip-triggers \
+        --host "${DBHOST}" \
+        "${DATABASE}" > "${SOURCE_DIRECTORY}/db-data-dump.sql"
 }
 
 function runBackup() {
-    connectAndDump
+    dumpMysql
     runDuplicity
     removeOldBackups
 }

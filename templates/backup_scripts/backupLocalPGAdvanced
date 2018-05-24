@@ -8,25 +8,47 @@
 #                                                                              #
 ################################################################################
 #
-# Back up a location with duplicity
+#This script dumps the database from a postgresql docker container
+#to the destonation file.
 #
 ##############################---INCLUDES---####################################
 
-. ./backupConfig
+. "${BACKUP_BACKEND}.cf"
 . ./runDuplicity
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+: ${DBUSER:="postgres"}
+
+#Mising variables are included from backupConfig
+SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+DESTINATION="${SOURCE_DIRECTORY}/${DATABASE}.sql"
+: ${PGDUMP_BINARY:="pg_dump"}
+: ${DB_HOST:="localhsot"}
 
 ################################################################################
 
 ##############################---FUNCTIONS---###################################
 
-function runBackup() {
-  gitlabBackup
-  runDuplicity
-  removeOldBackups
+function connectAndDump() {
+    if  [ -e ${SOURCE_DIRECTORY} ]
+    then
+        rm -fr ${SOURCE_DIRECTORY}
+    fi
+
+    mkdir -p ${SOURCE_DIRECTORY}
+    sudo -u ${DBUSER} \
+        ${PGDUMP_BINARY} \
+        -h ${DB_HOST} \
+        ${DATABASE} > ${DESTINATION}
 }
 
-function gitlabBackup() {
-  docker exec "${DOCKER_CONTAINER}" bash -c "gitlab-rake gitlab:backup:create SKIP=repositories" >> /dev/null
+function runBackup() {
+    connectAndDump
+    runDuplicity
+    removeOldBackups
 }
 
 ################################################################################

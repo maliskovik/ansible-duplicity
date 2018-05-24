@@ -8,62 +8,41 @@
 #                                                                              #
 ################################################################################
 #
-# Dumps mysql database and runs duplicity backup on it.
+#This script dumps a local mongo database and backs it up.
 #
 ##############################---INCLUDES---####################################
 
-. ./backupConfig
+. "${BACKUP_BACKEND}.cf"
 . ./runDuplicity
 
 ################################################################################
 
 ##############################---VARIABLES---###################################
 
-: ${DBHOST:="127.0.0.1"}
-#Missing variables are included from backupConfig
+#Mising variables are included from backupConfig
 SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
-DESTINATION="${SOURCE_DIRECTORY}/${DATABASE}.sql"
+DESTINATION="${SOURCE_DIRECTORY}/${DATABASE}"
 
 ################################################################################
 
 ##############################---FUNCTIONS---###################################
 
-function dumpMysql() {
+function dump() {
     if  [ -e ${SOURCE_DIRECTORY} ]
     then
         rm -fr ${SOURCE_DIRECTORY}
     fi
 
     mkdir -p ${SOURCE_DIRECTORY}
-
-    #Dump schema
-    mysqldump \
-        --no-data \
-        --skip-triggers \
-        --skip-routines \
-        --host "${DBHOST}" \
-        "${DATABASE}" > "${SOURCE_DIRECTORY}/db-schema-dump.sql"
-
-    #Dump processes
-    mysqldump \
-        --no-data \
-        --no-create-info \
-        --triggers \
-        --routines \
-        --skip-routines \
-        --host "${DBHOST}" \
-        "${DATABASE}" > "${SOURCE_DIRECTORY}/db-proc-dump.sql"
-
-    #Dump data
-    mysqldump \
-        --no-create-info \
-        --skip-triggers \
-        --host "${DBHOST}" \
-        "${DATABASE}" > "${SOURCE_DIRECTORY}/db-data-dump.sql"
+    mongodump \
+        -h 127.0.0.1 \
+        -d ${DATABASE} \
+         --quiet \
+        --out ${DESTINATION}
 }
 
 function runBackup() {
-    dumpMysql
+    dump
     runDuplicity
     removeOldBackups
 }

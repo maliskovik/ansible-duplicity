@@ -5,6 +5,7 @@
     force: yes
   with_items:
     - duplicity
+    - gnupg2
   when: ansible_os_family == "Debian"
 
 - name: Install python paramiko
@@ -31,21 +32,34 @@
     mode: 0755
     state: directory
 
-- name: Server config
+- name: Private backends
   template:
     src: backup_config
-    dest: "{{ backup_directory }}/backupConfig"
-    mode: 0755
+    dest: "{{ backup_directory }}/{{ item.name }}.cf"
+    mode: 0700
     owner: root
     group: root
+  with_items: "{{ duplicity_backends|default(omit) }}"
+  when: duplicity_backends is defined
+
+- name: Group backends
+  template:
+    src: backup_config
+    dest: "{{ backup_directory }}/{{ item.name }}.cf"
+    mode: 0700
+    owner: root
+    group: root
+  with_items: "{{ duplicity_group_backends|default(omit) }}"
+  when: duplicity_group_backends is defined
 
 - name: Copy scripts
-  copy:
-    src: backupScripts/
+  template:
+    src: "{{ item }}"
     dest: "{{ backup_directory }}"
     owner: root
     group: root
     mode: 0755
+  with_fileglob: "templates/backup_scripts/*"
 
 - name: Set backups
   copy:

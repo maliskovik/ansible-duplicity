@@ -18,3 +18,4 @@
 # └───────────────────────── min (0 - 59)
 MAILTO="{{ duplicity_mail_to }}"
 5 * * * * root {{ backup_directory }}/runBackup
+0 6 * * * root {{ backup_directory }}/verifyBackup

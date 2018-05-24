@@ -8,11 +8,11 @@
 #                                                                              #
 ################################################################################
 #
-#This script dumps a local mongo database and backs it up.
+#Prepares LDAP dump to backup.
 #
 ##############################---INCLUDES---####################################
 
-. ./backupConfig
+. "${BACKUP_BACKEND}.cf"
 . ./runDuplicity
 
 ################################################################################
@@ -21,28 +21,24 @@
 
 #Mising variables are included from backupConfig
 SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
-DESTINATION="${SOURCE_DIRECTORY}/${DATABASE}"
+DESTINATION="${SOURCE_DIRECTORY}/dump.ldif"
 
 ################################################################################
 
 ##############################---FUNCTIONS---###################################
 
-function dump() {
+function LDump() {
     if  [ -e ${SOURCE_DIRECTORY} ]
     then
         rm -fr ${SOURCE_DIRECTORY}
     fi
 
     mkdir -p ${SOURCE_DIRECTORY}
-    mongodump \
-        -h 127.0.0.1 \
-        -d ${DATABASE} \
-         --quiet \
-        --out ${DESTINATION}
+    slapcat > "${DESTINATION}"
 }
 
 function runBackup() {
-    dump
+    LDump
     runDuplicity
     removeOldBackups
 }

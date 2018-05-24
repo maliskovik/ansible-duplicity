@@ -13,7 +13,7 @@
 #
 ##############################---INCLUDES---####################################
 
-. ./backupConfig
+. "${BACKUP_BACKEND}.cf"
 . ./runDuplicity
 
 ################################################################################
@@ -21,7 +21,6 @@
 ##############################---VARIABLES---###################################
 
 DBUSER="postgres"
-DBHOST="localhost"
 
 #Mising variables are included from backupConfig
 SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
@@ -38,11 +37,9 @@ function connectAndDump() {
     fi
 
     mkdir -p ${SOURCE_DIRECTORY}
-    docker exec "${CONTAINER}" bash -c \
-            "pg_dump \
-                -U ${DBUSER} \
-                -h ${DBHOST} \
-                ${DATABASE}" > ${DESTINATION}
+    pg_dump \
+        -U ${DBUSER} \
+        ${DATABASE} > ${DESTINATION}
 }
 
 function runBackup() {

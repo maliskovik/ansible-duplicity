@@ -8,11 +8,12 @@
 #                                                                              #
 ################################################################################
 #
-# This script dumps all databases from a mysql docker container to a file.
+#This script dumps the database from a postgresql docker container
+#to the destonation file.
 #
 ##############################---INCLUDES---####################################
 
-. ./backupConfig
+. "${BACKUP_BACKEND}.cf"
 . ./runDuplicity
 
 ################################################################################
@@ -24,7 +25,7 @@ DBHOST="localhost"
 
 #Mising variables are included from backupConfig
 SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
-DESTINATION="${SOURCE_DIRECTORY}/dump.sql"
+DESTINATION="${SOURCE_DIRECTORY}/${DATABASE}.sql"
 
 ################################################################################
 
@@ -38,10 +39,10 @@ function connectAndDump() {
 
     mkdir -p ${SOURCE_DIRECTORY}
     docker exec "${CONTAINER}" bash -c \
-            "mysqldump \
-                -u ${MYSQL_USER} \
-                -p${MYSQL_PASSWORD} \
-                --all-databases" > ${DESTINATION}
+            "pg_dump \
+                -U ${DBUSER} \
+                -h ${DBHOST} \
+                ${DATABASE}" > ${DESTINATION}
 }
 
 function runBackup() {

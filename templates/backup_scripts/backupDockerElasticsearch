@@ -8,23 +8,20 @@
 #                                                                              #
 ################################################################################
 #
-#This script dumps the database from a postgresql docker container
+#This script dumps the database from a elasticsearch docker container
 #to the destonation file.
 #
 ##############################---INCLUDES---####################################
 
-. ./backupConfig
+. "${BACKUP_BACKEND}.cf"
 . ./runDuplicity
 
 ################################################################################
 
 ##############################---VARIABLES---###################################
 
-DBUSER="postgres"
-
-#Mising variables are included from backupConfig
+DOCKER_IMAGE="kendu/projectbuilder:elasticdump"
 SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
-DESTINATION="${SOURCE_DIRECTORY}/${DATABASE}.sql"
 
 ################################################################################
 
@@ -36,10 +33,20 @@ function connectAndDump() {
         rm -fr ${SOURCE_DIRECTORY}
     fi
 
-    mkdir -p ${SOURCE_DIRECTORY}
-    pg_dump \
-        -U ${DBUSER} \
-        ${DATABASE} > ${DESTINATION}
+    mkdir -p "${SOURCE_DIRECTORY}"
+    docker run --rm \
+      -v ${SOURCE_DIRECTORY}:${SOURCE_DIRECTORY} \
+      --link "${CONTAINER}:es" \
+      "${DOCKER_IMAGE}" \
+      bash -c \
+            "elasticdump \
+              --input=http://es:9200/${ES_INDEX} \
+              --output=${SOURCE_DIRECTORY}/${ES_INDEX}-mapping.json \
+              --type=mapping >> /dev/null
+            elasticdump \
+              --input=http://es:9200/${ES_INDEX} \
+              --output=${SOURCE_DIRECTORY}/${ES_INDEX}-data.json \
+              --type=data >> /dev/null"
 }
 
 function runBackup() {

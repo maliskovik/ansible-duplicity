@@ -8,47 +8,18 @@
 #                                                                              #
 ################################################################################
 #
-# This script dumps the rethinkDB inside the container which is running it
-# and transfers the file to the detination on the host. The dump is then backed
-# up with duplicity.
+# Back up a location with duplicity
 #
 ##############################---INCLUDES---####################################
 
-. ./backupConfig
+. "${BACKUP_BACKEND}.cf"
 . ./runDuplicity
-
-################################################################################
-
-##############################---VARIABLES---###################################
-
-DUMPFILE="dump.tar.gz"
-SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
 
 ################################################################################
 
 ##############################---FUNCTIONS---###################################
 
-function dumpRethinkDb() {
-    if  [ -e ${SOURCE_DIRECTORY} ]
-    then
-        rm -fr ${SOURCE_DIRECTORY}
-    fi
-
-    mkdir -p ${SOURCE_DIRECTORY}
-    cd ${SOURCE_DIRECTORY}
-    docker exec ${CONTAINER} bash -c \
-        "rm -f /tmp/${DUMPFILE}; rethinkdb dump -f /tmp/${DUMPFILE}" >> \
-        /dev/null
-    docker exec ${CONTAINER} bash -c "cat /tmp/${DUMPFILE}" > ${DUMPFILE}
-    tar -zxvf ${DUMPFILE} >> /dev/null
-    rm ${DUMPFILE}
-    mv rethinkdb_dump_*/* .
-    rm -fr rethinkdb_dump_*
-    cd ${BACKUPDIR}
-}
-
 function runBackup() {
-    dumpRethinkDb
     runDuplicity
     removeOldBackups
 }

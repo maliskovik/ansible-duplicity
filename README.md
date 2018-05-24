@@ -5,6 +5,12 @@ The backups configs should be placed in files/backupConfigs/<hostname>
 ## Mandatory variables
 * duplicity_sftp_username - username for the backup location(remote)
 * duplicity_sftp_destination - hostname of the backup destination
+* duplicity_backends: - a structure with info about the backend
+  * name - user friendly name ( single string )
+  * username - username to use for authentication
+  * address - backend address
+  * port- backend port
+  * proto - protocol to use(sftp/rsync...)
 
 ## Optional variables
 
@@ -12,6 +18,12 @@ The backups configs should be placed in files/backupConfigs/<hostname>
 * duplicity_log_directory - where logs of individual backups are stored
 * duplicity_log: /var/log/duplicity.log - duplicity log
 * duplicity_local_backup_dir - local backup destination - if this is set, remote settings are ignored.
+* duplicity_group_backends: - a structure with info about the backend
+  * name - user friendly name ( single string )
+  * username - username to use for authentication
+  * address - backend address
+  * port- backend port
+  * proto - protocol to use(sftp/rsync...)
 
 # Backup scripts
 

@@ -19,11 +19,19 @@
 LOCAL_BACKUP_DIR="{{ duplicity_local_backup_dir }}"
 {% else %}
 #Login name for backup server
-USERNAME="{{ duplicity_sftp_username }}"
+USERNAME="{{ item.username }}"
+{% if item.password is defined %}
+#Login name for backup server
+PASSWORD="{{ item.password }}"
+{% endif %}
+{% if item.module is defined %}
+#Login name for backup server
+MODULE="{{ item.module }}"
+{% endif %}
 #Backup server name
-SERVER="{{ duplicity_sftp_destination }}"
+SERVER="{{ item.address }}"
 #Backup server port
-PORT="{{ duplicity_sftp_port }}"
+PORT="{{ item.port }}"
 #Location of backup directory.
 {% endif %}
 LOGDIR="{{ duplicity_log_directory }}"
@@ -31,13 +39,23 @@ LOGDIR="{{ duplicity_log_directory }}"
 BACKUPDIR="{{ backup_directory }}"
 #Duplicity log file
 DUPLICITYLOG="{{ duplicity_log }}"
+# GPG passphrase to unlock gpg key
+GPG_PASSPHRASE="{{ duplicity_gpg_passphrase }}"
+# GPG key
+GPG_KEY="{{ item.gpg_key }}"
+#Protocol for connection
+PROTO="{{ item.proto }}"
 
 #Derived variables
 LOGFILE="${LOGDIR}/${BACKUP_NAME}.log"
 {% if duplicity_local_backup_dir is defined %}
 DESTINATION_URL="FILE://${LOCAL_BACKUP_DIR}/${BACKUP_NAME}"
 {% else %}
-DESTINATION_URL="sftp://${USERNAME}@${SERVER}:${PORT}/${BACKUP_NAME}"
+{% if item.proto == "rsync" %}
+DESTINATION_URL="${PROTO}://${USERNAME}:${PASSWORD}@${SERVER}:${PORT}::/${MODULE}/${BACKUP_NAME}"
+{% else %}
+DESTINATION_URL="{{ item.proto }}://${USERNAME}@${SERVER}:${PORT}/${BACKUP_NAME}"
+{% endif %}
 {% endif %}
 
 ################################################################################

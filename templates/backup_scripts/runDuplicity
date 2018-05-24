@@ -26,16 +26,27 @@ function runDuplicity() {
     echo "# Started the backup of ${BACKUP_NAME}" >> "${DUPLICITYLOG}"
     echo "" >> "${DUPLICITYLOG}"
 
-    duplicity --full-if-older-than "${FULL_BACKUP_INTERVAL}" \
-        --no-encryption \
-        --log-file ${DUPLICITYLOG} \
-        "${SOURCE_DIRECTORY}" \
-        "${DESTINATION_URL}" >> "${LOGFILE}"
+if [ "${PROTO}" = "rsync" ]
+then
+  mkdir -p "tmp/${BACKUP_NAME}"
+  RSYNC_PASSWORD="${PASSWORD}" rsync -a --recursive  "tmp/${BACKUP_NAME}" "${PROTO}://${USERNAME}@${SERVER}:${PORT}/${MODULE}" >> /dev/null
+  rmdir "tmp/${BACKUP_NAME}"
+fi
+  PASSPHRASE="${GPG_PASSPHRASE}"    duplicity --full-if-older-than "${FULL_BACKUP_INTERVAL}" \
+          --num-retries 10 \
+          --encrypt-key "${GPG_KEY}" \
+          --gpg-binary "/usr/bin/gpg2" \
+          --log-file ${DUPLICITYLOG} \
+          "${SOURCE_DIRECTORY}" \
+          "${DESTINATION_URL}" >> "${LOGFILE}"
 }
 
+
 function removeOldBackups() {
-    duplicity remove-all-but-n-full ${SETS_TO_KEEP} \
-        --no-encryption \
+PASSPHRASE="${GPG_PASSPHRASE}"    duplicity remove-all-but-n-full ${SETS_TO_KEEP} \
+        --num-retries 10 \
+        --encrypt-key "${GPG_KEY}" \
+        --gpg-binary "/usr/bin/gpg2" \
         --force \
         --log-file ${DUPLICITYLOG} \
         ${DESTINATION_URL} >> "${LOGFILE}"
