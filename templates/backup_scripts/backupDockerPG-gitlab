@@ -21,12 +21,12 @@
 ##############################---VARIABLES---###################################
 
 : ${DBUSER:="postgres"}
+: ${DBHOST:="localhost"}
+: ${DATABASE:="gitlabhq_production"}
 
 #Mising variables are included from backupConfig
 SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
 DESTINATION="${SOURCE_DIRECTORY}/${DATABASE}.sql"
-: ${PGDUMP_BINARY:="pg_dump"}
-: ${DB_HOST:="localhost"}
 
 ################################################################################
 
@@ -39,10 +39,8 @@ function connectAndDump() {
     fi
 
     mkdir -p ${SOURCE_DIRECTORY}
-    sudo -u ${DBUSER} \
-        ${PGDUMP_BINARY} \
-        -h ${DB_HOST} \
-        ${DATABASE} > ${DESTINATION}
+    docker exec "${CONTAINER}" bash -c \
+            "su -c '/opt/gitlab/embedded/bin/pg_dump --port 5432 -h /var/opt/gitlab/postgresql -d ${DATABASE}' ${DBUSER}" > ${DESTINATION}
 }
 
 function runBackup() {
