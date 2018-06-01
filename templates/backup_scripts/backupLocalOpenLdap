@@ -34,7 +34,7 @@ function LDump() {
     fi
 
     mkdir -p ${SOURCE_DIRECTORY}
-    slapcat > "${DESTINATION}"
+    /usr/sbin/slapcat > "${DESTINATION}"
 }
 
 function runBackup() {

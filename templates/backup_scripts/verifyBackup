@@ -29,11 +29,12 @@ function chackForBackup() {
   do
     . "./${backup}"
     . "${BACKUP_BACKEND}.cf"
-    if [[ $(duplicity collection-status $DESTINATION_URL | grep -e "Incremental         $(date +'%a %b %e') ..:..:.. $(date +%Y)                 ?" | wc -l) > 0 ]]
+    if [[ $(duplicity collection-status $DESTINATION_URL | grep -e "Incremental         $(date +'%a %b %e') ..:..:.. $(date +%Y)" | wc -l) > 0 ]]
     then
-      echo "Backup - ${BACKUP_NAME}: OK"
-    elif [[ $(duplicity collection-status $DESTINATION_URL | grep -e "Full         $(date +'%a %b %e') ..:..:.. $(date +%Y)                 ?" | wc -l) > 0 ]]
-      echo "Backup - ${BACKUP_NAME}: OK"
+      echo "Backup - ${BACKUP_NAME}: OK" >> /dev/null
+    elif [[ $(duplicity collection-status $DESTINATION_URL | grep -e "Full         $(date +'%a %b %e') ..:..:.. $(date +%Y)" | wc -l) > 0 ]]
+    then
+      echo "Backup - ${BACKUP_NAME}: OK" >> /dev/null
     else
       echo "Backup - ${BACKUP_NAME}: missing!"
       BACKUP_STATUS=1
