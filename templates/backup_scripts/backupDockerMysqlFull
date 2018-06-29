@@ -41,7 +41,7 @@ function connectAndDump() {
             "mysqldump \
                 -u ${MYSQL_USER} \
                 -p${MYSQL_PASSWORD} \
-                --all-databases" > ${DESTINATION}
+                --all-databases --events" > ${DESTINATION}
 }
 
 function runBackup() {
