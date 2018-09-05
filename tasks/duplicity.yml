@@ -6,6 +6,8 @@
   with_items:
     - duplicity
     - gnupg2
+    - pinentry-gtk2
+
   when: ansible_os_family == "Debian"
 
 - name: Install python paramiko
@@ -23,6 +25,25 @@
     - duplicity
     - python-paramiko
   when: ansible_os_family == "Archlinux"
+
+- name: Set GPG options
+  lineinfile:
+    state: present
+    path: "/root/.gnupg/gpg.conf"
+    line: "{{ item }}"
+    create: yes
+  with_items:
+    - "use-agent"
+    - "pinentry-mode loopback"
+  notify: Reload GPG agent
+
+- name: Set GPG agent options
+  lineinfile:
+    state: present
+    path: "/root/.gnupg/gpg-agent.conf"
+    line: "allow-loopback-pinentry"
+    create: yes
+  notify: Reload GPG agent
 
 - name: Create backup directory
   file:

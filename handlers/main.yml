@@ -1,0 +1,5 @@
+---
+#Docker role handlers
+
+- name: Reload GPG agent
+  command: echo RELOADAGENT | gpg-connect-agent
