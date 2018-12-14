@@ -1,12 +1,8 @@
 - name: Install duplicity - debian
   apt:
-    name: "{{ item }}"
+    name: "{{ duplicity_ubuntu_packages }}"
     state: latest
     force: yes
-  with_items:
-    - duplicity
-    - gnupg2
-    - pinentry-gtk2
 
   when: ansible_os_family == "Debian"
 
@@ -18,12 +14,9 @@
 
 - name: Install duplicity -arch
   pacman:
-    name: "{{ item }}"
+    name: "{{ duplicity_arch_packages }}"
     state: latest
     force: yes
-  with_items:
-    - duplicity
-    - python-paramiko
   when: ansible_os_family == "Archlinux"
 
 - name: Set GPG options
