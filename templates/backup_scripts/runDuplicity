@@ -36,6 +36,7 @@ fi
           --num-retries 10 \
           --encrypt-key "${GPG_KEY}" \
           --gpg-binary "/usr/bin/gpg2" \
+          --copy-links \
           --log-file ${DUPLICITYLOG} \
           "${SOURCE_DIRECTORY}" \
           "${DESTINATION_URL}" >> "${LOGFILE}"
@@ -48,6 +49,7 @@ PASSPHRASE="${GPG_PASSPHRASE}"    duplicity remove-all-but-n-full ${SETS_TO_KEEP
         --encrypt-key "${GPG_KEY}" \
         --gpg-binary "/usr/bin/gpg2" \
         --force \
+        --copy-links \
         --log-file ${DUPLICITYLOG} \
         ${DESTINATION_URL} >> "${LOGFILE}"
 }

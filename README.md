@@ -1,4 +1,4 @@
-# DUPLICITY
+# DUPLICITYDescription
 The backup utility
 The backups configs should be placed in files/backupConfigs/<hostname>
 
@@ -24,6 +24,28 @@ The backups configs should be placed in files/backupConfigs/<hostname>
   * address - backend address
   * port- backend port
   * proto - protocol to use(sftp/rsync...)
+
+# Setting up GPG key
+
+```
+gpg2 --full-gen-key
+```
+Process:
+* (1) - default
+* 4096
+* 10y
+* y
+* Real name: Support IT
+* Email address: support-it@cosylab.com
+* Comment: Main encrypt key
+* o
+* <insert random string here>
+
+```
+gpg2 --list-keys
+gpg2 --output <hostname>_gpg_key_sec.gpg --armor --export-secret-key <ID of key listed above>
+```
+Backup the exported key.
 
 # Backup scripts
 

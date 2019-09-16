@@ -1,3 +1,4 @@
 duplicity_ubuntu_packages:
     - duplicity
     - gnupg
+    - gnupg2
