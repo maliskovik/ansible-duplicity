@@ -19,6 +19,24 @@
     force: yes
   when: ansible_os_family == "Archlinux"
 
+- name: Install duplicity - CentOS
+  yum:
+    name: "{{ duplicity_centos_packages }}"
+    state: present
+  notify: Start nginx
+  when: ansible_os_family == "RedHat"
+
+- name: Set GPG options Centos
+  lineinfile:
+    state: present
+    path: "/root/.gnupg/gpg.conf"
+    line: "{{ item }}"
+    create: yes
+  with_items:
+    - "use-agent"
+  notify: Reload GPG agent
+  when: ansible_os_family == "RedHat"
+
 - name: Set GPG options
   lineinfile:
     state: present
@@ -29,6 +47,7 @@
     - "use-agent"
     - "pinentry-mode loopback"
   notify: Reload GPG agent
+  when: ansible_os_family == "Debian"
 
 - name: Set GPG agent options
   lineinfile:

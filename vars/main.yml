@@ -2,3 +2,7 @@ duplicity_ubuntu_packages:
     - duplicity
     - gnupg
     - gnupg2
+
+duplicity_centos_packages:
+  - duplicity
+  - python-paramiko
