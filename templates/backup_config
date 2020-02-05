@@ -14,9 +14,9 @@
 #
 ##############################---VARIABLES---###################################
 
-{% if duplicity_local_backup_dir is defined %}
+{% if item.local_backup_dir is defined %}
 #Local backup destination directory
-LOCAL_BACKUP_DIR="{{ duplicity_local_backup_dir }}"
+LOCAL_BACKUP_DIR="{{ item.local_backup_dir }}"
 {% else %}
 #Login name for backup server
 USERNAME="{{ item.username }}"
@@ -48,13 +48,13 @@ PROTO="{{ item.proto }}"
 
 #Derived variables
 LOGFILE="${LOGDIR}/${BACKUP_NAME}.log"
-{% if duplicity_local_backup_dir is defined %}
+{% if item.proto == "local" %}
 DESTINATION_URL="FILE://${LOCAL_BACKUP_DIR}/${BACKUP_NAME}"
 {% else %}
 {% if item.proto == "rsync" %}
 DESTINATION_URL="${PROTO}://${USERNAME}:${PASSWORD}@${SERVER}:${PORT}::/${MODULE}/${BACKUP_NAME}"
 {% else %}
-DESTINATION_URL="{{ item.proto }}://${USERNAME}@${SERVER}:${PORT}/${BACKUP_NAME}"
+DESTINATION_URL="${PROTO}://${USERNAME}@${SERVER}:${PORT}/${BACKUP_NAME}"
 {% endif %}
 {% endif %}
 
