@@ -20,10 +20,12 @@ function runDuplicity() {
   fi
 
   echo "################################################################################" >> "${LOGFILE}"
-  echo "# Started the backup of ${BACKUP_NAME} - $(date)" >> "${LOGFILE}"
+  echo "# Started the backup of ${BACKUP_NAME}" >> "${LOGFILE}"
+  echo "# Started at $(date)" >> "${LOGFILE}"
   echo "" >> "${LOGFILE}"
   echo "################################################################################" >> "${DUPLICITYLOG}"
   echo "# Started the backup of ${BACKUP_NAME}" >> "${DUPLICITYLOG}"
+  echo "# Started at $(date)" >> "${DUPLICITYLOG}"
   echo "" >> "${DUPLICITYLOG}"
 
   if [ "${PROTO}" = "rsync" ]
