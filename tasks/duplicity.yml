@@ -23,7 +23,6 @@
   yum:
     name: "{{ duplicity_centos_packages }}"
     state: present
-  notify: Start nginx
   when: ansible_os_family == "RedHat"
 
 - name: Set GPG options Centos
@@ -107,5 +106,13 @@
     src: cron_job
     dest: /etc/cron.d/duplicity
     mode: 0755
+    owner: root
+    group: root
+
+- name: Set logrotate policy
+  template:
+    src: logrotate
+    dest: /etc/logrotate.d/duplicity
+    mode: 0644
     owner: root
     group: root

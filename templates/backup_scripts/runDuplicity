@@ -20,7 +20,7 @@ function runDuplicity() {
   fi
 
   echo "################################################################################" >> "${LOGFILE}"
-  echo "# Started the backup of ${BACKUP_NAME}" >> "${LOGFILE}"
+  echo "# Started the backup of ${BACKUP_NAME} - $(date)" >> "${LOGFILE}"
   echo "" >> "${LOGFILE}"
   echo "################################################################################" >> "${DUPLICITYLOG}"
   echo "# Started the backup of ${BACKUP_NAME}" >> "${DUPLICITYLOG}"
