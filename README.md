@@ -98,6 +98,11 @@ some history then set it to the
 * CONTAINER -string - Name of the container to connect to ( when backing up
     content from a docker container)
 
+## Checking backup chains
+PASSPHRASE="${GPG_PASSPHRASE}"    duplicity --encrypt-key "${GPG_KEY}" \
+          --gpg-binary "/usr/bin/gpg2" \
+          collection-status "${DESTINATION_URL}"
+
 ## Restoring data.
 To restore data run duplicity restore.
 ```
