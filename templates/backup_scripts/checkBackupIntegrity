@@ -1,0 +1,61 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+# Test restore of backups
+#
+#################################---ENV---######################################
+
+set -e
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+VERIFY_LOGDIR="/var/log/backup/verify"
+MAIL_TO="{{ duplicity_mail_to }}"
+MAIL_FROM="{{ duplicity_mail_from }}"
+
+################################################################################
+
+###############################---WORKDIR---####################################
+
+cd $( dirname $0 )
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function verifyBackups() {
+  mkdir -p "${VERIFY_LOGDIR}"
+  for backup in *.conf
+  do
+    . "./${backup}"
+    . "${BACKUP_BACKEND}.cf"
+    verify_logfile="${VERIFY_LOGDIR}/${BACKUP_NAME}"
+    echo "To: ${MAIL_TO}" > "${verify_logfile}"
+    echo "From: ${MAIL_FROM}" >> "${verify_logfile}"
+    echo "Subject: Verifying backup ${BACKUP_NAME}" >> "${verify_logfile}"
+    echo "Verifying ${BACKUP_NAME}: " | tee -a "${verify_logfile}"
+    echo "" | tee -a "${verify_logfile}"
+    PASSPHRASE="${GPG_PASSPHRASE}" duplicity verify  --encrypt-key "${GPG_KEY}" \
+                      --gpg-binary "/usr/bin/gpg2" \
+                      "${DESTINATION_URL}" "${SOURCE_DIRECTORY}" | tee -a "${verify_logfile}"
+  cat "${verify_logfile}" | sendmail "${MAIL_TO}"
+  done
+  exit ${BACKUP_STATUS}
+}
+
+################################################################################
+
+###############################---EXECUTION---##################################
+
+verifyBackups
+
+################################################################################
