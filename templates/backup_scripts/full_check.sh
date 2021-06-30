@@ -10,39 +10,25 @@
 #
 # Looks at backup configs and list backup chains
 #
-##############################---VARIABLES---###################################
-
-BACKUP_STATUS=0
-VERIFY_LOGDIR="/var/log/backup/verify_chains"
-
-################################################################################
-
-###############################---WORKDIR---####################################
-
-cd $( dirname $0 )
-
 ################################################################################
 
 ##############################---FUNCTIONS---###################################
 
-function chackForBackup() {
-  rm -fr "${VERIFY_LOGDIR}"
-  mkdir -p "${VERIFY_LOGDIR}"
-  for backup in *.conf
-  do
-    . "./${backup}"
-    . "${BACKUP_BACKEND}.cf"
-    export PASSPHRASE="${GPG_PASSPHRASE}"
-    echo "Collection status for ${BACKUP_NAME}: " | tee "${VERIFY_LOGDIR}/${BACKUP_NAME}"
-    duplicity collection-status $DESTINATION_URL | tee -a "${VERIFY_LOGDIR}/${BACKUP_NAME}"
-  done
-  exit ${BACKUP_STATUS}
+function runTests() {
+  cd ~
+  # Disable duplicity runs
+  mv /etc/cron.d/duplicity duplicity_cronjob
+  /opt/backup/checkFileList
+  /opt/backup/checkChains
+  /opt/backup/checkBackupIntegrity
+  # Re-enable duplicity
+  mv duplicity_cronjob /etc/cron.d/duplicity
 }
 
 ################################################################################
 
 ###############################---EXECUTION---##################################
 
-chackForBackup
+runTests
 
 ################################################################################

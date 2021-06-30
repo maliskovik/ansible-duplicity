@@ -18,7 +18,7 @@ set -e
 
 ##############################---VARIABLES---###################################
 
-VERIFY_LOGDIR="/var/log/backup/verify"
+VERIFY_LOGDIR="/var/log/backup/verify_backup_integrity"
 MAIL_TO="{{ duplicity_mail_to }}"
 MAIL_FROM="{{ duplicity_mail_from }}"
 
@@ -33,11 +33,13 @@ cd $( dirname $0 )
 ##############################---FUNCTIONS---###################################
 
 function verifyBackups() {
+  rm -fr "${VERIFY_LOGDIR}"
   mkdir -p "${VERIFY_LOGDIR}"
   for backup in *.conf
   do
     . "./${backup}"
     . "${BACKUP_BACKEND}.cf"
+    export PASSPHRASE="${GPG_PASSPHRASE}"
     verify_logfile="${VERIFY_LOGDIR}/${BACKUP_NAME}"
     echo "To: ${MAIL_TO}" > "${verify_logfile}"
     echo "From: ${MAIL_FROM}" >> "${verify_logfile}"

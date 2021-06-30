@@ -10,6 +10,16 @@
   pip:
     name: paramiko
     state: present
+    executable: pip3
+  when:
+    - ansible_os_family == "Debian"
+    - ansible_lsb.id == "Ubuntu"
+    - ansible_lsb.major_release|int >= 18
+
+- name: Install python paramiko
+  pip:
+    name: paramiko
+    state: present
   when: ansible_os_family == "Debian"
 
 - name: Install duplicity -arch
@@ -105,7 +115,7 @@
   template:
     src: cron_job
     dest: /etc/cron.d/duplicity
-    mode: 0755
+    mode: 0644
     owner: root
     group: root
 

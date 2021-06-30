@@ -30,13 +30,10 @@ DESTINATION="${SOURCE_DIRECTORY}/dump.sql"
 ##############################---FUNCTIONS---###################################
 
 function connectAndDump() {
-    if  [ -e ${SOURCE_DIRECTORY} ]
-    then
-        rm -fr ${SOURCE_DIRECTORY}
-    fi
-
     mkdir -p ${SOURCE_DIRECTORY}
+    psql -U ${DBUSER} -c "select pg_wal_replay_pause();" > /dev/null
     sudo -u ${DBUSER} pg_dumpall > ${DESTINATION}
+    psql -U ${DBUSER} -c "select pg_wal_replay_resume();" > /dev/null
 }
 
 function runBackup() {

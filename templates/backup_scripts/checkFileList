@@ -13,7 +13,7 @@
 ##############################---VARIABLES---###################################
 
 BACKUP_STATUS=0
-FILE_LIST_DIR="/opt/backup/file_list"
+VERIFY_LOGDIR="/var/log/backup/verify_file_list"
 
 ################################################################################
 
@@ -26,13 +26,15 @@ cd $( dirname $0 )
 ##############################---FUNCTIONS---###################################
 
 function chackForBackup() {
-  mkdir "${FILE_LIST_DIR}"
+  rm -fr "${VERIFY_LOGDIR}"
+  mkdir -p "${VERIFY_LOGDIR}"
   for backup in *.conf
   do
     . "./${backup}"
     . "${BACKUP_BACKEND}.cf"
-    echo "Collection status for ${BACKUP_NAME}: "
-    duplicity list-current-files $DESTINATION_URL | tee "${FILE_LIST_DIR}/${BACKUP_NAME}"
+    export PASSPHRASE="${GPG_PASSPHRASE}"
+    echo "Collection status for ${BACKUP_NAME}: " | tee "${VERIFY_LOGDIR}/${BACKUP_NAME}"
+    duplicity list-current-files $DESTINATION_URL | tee -a "${VERIFY_LOGDIR}/${BACKUP_NAME}"
   done
   exit ${BACKUP_STATUS}
 }
