@@ -24,6 +24,7 @@ DBUSER="postgres"
 #Mising variables are included from backupConfig
 SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
 DESTINATION="${SOURCE_DIRECTORY}/dump.sql"
+: ${PG_REPLICATION:="false"}
 
 ################################################################################
 
@@ -31,9 +32,15 @@ DESTINATION="${SOURCE_DIRECTORY}/dump.sql"
 
 function connectAndDump() {
     mkdir -p ${SOURCE_DIRECTORY}
-    psql -U ${DBUSER} -c "select pg_wal_replay_pause();" > /dev/null
+    if [ $PG_REPLICATION == "true" ]
+    then
+      psql -U ${DBUSER} -c "select pg_wal_replay_pause();" > /dev/null
+    fi
     sudo -u ${DBUSER} pg_dumpall > ${DESTINATION}
-    psql -U ${DBUSER} -c "select pg_wal_replay_resume();" > /dev/null
+    if [ $PG_REPLICATION == "true" ]
+    then
+      psql -U ${DBUSER} -c "select pg_wal_replay_resume();" > /dev/null
+    fi
 }
 
 function runBackup() {

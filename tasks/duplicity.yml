@@ -6,11 +6,10 @@
 
   when: ansible_os_family == "Debian"
 
-- name: Install python paramiko
-  pip:
-    name: paramiko
-    state: present
-    executable: pip3
+- name: remove apt paramiko
+  apt:
+    name: python3-paramiko
+    state: absent
   when:
     - ansible_os_family == "Debian"
     - ansible_lsb.id == "Ubuntu"
@@ -20,7 +19,11 @@
   pip:
     name: paramiko
     state: present
-  when: ansible_os_family == "Debian"
+    executable: pip3
+  when:
+    - ansible_os_family == "Debian"
+    - ansible_lsb.id == "Ubuntu"
+    - ansible_lsb.major_release|int >= 18
 
 - name: Install duplicity -arch
   pacman:
