@@ -97,6 +97,7 @@ some history then set it to the
 "period you want to keep" / FULL_BACKUP_INTERVAL.
 * CONTAINER -string - Name of the container to connect to ( when backing up
     content from a docker container)
+* DESTINATION_ROOT_DIR - Directory on remote to directs backups to (must and with a trailing slash)
 
 ## Checking backup chains
 PASSPHRASE="${GPG_PASSPHRASE}"    duplicity --encrypt-key "${GPG_KEY}" \
