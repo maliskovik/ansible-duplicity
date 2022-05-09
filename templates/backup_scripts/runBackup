@@ -32,7 +32,7 @@ HOURS=${1:-$(date +%-k )}
 
 for backup in *.conf
 do
-    DESTINATION_ROOT_DIR=""
+    unset DESTINATION_ROOT_DIR
     . "./${backup}"
     if [ ${BACKUP_INTERVAL} == 0 ]
         then
