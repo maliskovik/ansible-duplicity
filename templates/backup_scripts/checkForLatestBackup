@@ -27,6 +27,7 @@ cd $( dirname $0 )
 function chackForBackup() {
   for backup in *.conf
   do
+    unset DESTINATION_ROOT_DIR
     . "./${backup}"
     . "${BACKUP_BACKEND}.cf"
     if [[ $(duplicity collection-status $DESTINATION_URL | grep -e "Incremental         $(date +'%a %b %e') ..:..:.. $(date +%Y)" | wc -l) > 0 ]]

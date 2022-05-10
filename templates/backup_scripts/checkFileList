@@ -30,6 +30,7 @@ function chackForBackup() {
   mkdir -p "${VERIFY_LOGDIR}"
   for backup in *.conf
   do
+    unset DESTINATION_ROOT_DIR
     . "./${backup}"
     . "${BACKUP_BACKEND}.cf"
     export PASSPHRASE="${GPG_PASSPHRASE}"
