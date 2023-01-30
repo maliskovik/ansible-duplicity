@@ -28,6 +28,7 @@ The backups configs should be placed in files/backupConfigs/<hostname>
 # Setting up GPG key
 
 ```
+apt install gnupg2
 gpg2 --full-gen-key
 ```
 Process:
@@ -156,4 +157,11 @@ mkdir .ssh
 * Copy the pub key to the backup host.
 ```
 scp id_rsa_rfc.pub <backup host>:/.ssh/authorized_keys
+```
+
+## Backing up mysql with password
+You can save the password on the server in a config file of the user running the backup in `~/.my.cnf`
+```
+[client]
+password='my_very_secret_pass'
 ```
