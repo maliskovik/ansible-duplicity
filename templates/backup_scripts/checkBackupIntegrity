@@ -23,7 +23,7 @@ MAIL_TO="{{ duplicity_mail_to }}"
 MAIL_FROM="{{ duplicity_mail_from }}"
 
 ################################################################################
-
+dffdf
 ###############################---WORKDIR---####################################
 
 cd $( dirname $0 )
@@ -35,6 +35,7 @@ cd $( dirname $0 )
 function verifyBackups() {
   rm -fr "${VERIFY_LOGDIR}"
   mkdir -p "${VERIFY_LOGDIR}"
+  export TMPDIR=/storage/backup
   for backup in *.conf
   do
     unset DESTINATION_ROOT_DIR
@@ -52,6 +53,7 @@ function verifyBackups() {
                       "${DESTINATION_URL}" "${SOURCE_DIRECTORY}" | tee -a "${verify_logfile}"
   cat "${verify_logfile}" | sendmail "${MAIL_TO}"
   done
+  
   exit ${BACKUP_STATUS}
 }
 

@@ -43,10 +43,15 @@ function connectAndDump() {
     fi
 }
 
+function cleanup() {
+    rm -fr ${SOURCE_DIRECTORY}
+}
+
 function runBackup() {
     connectAndDump
     runDuplicity
     removeOldBackups
+    cleanup
 }
 
 ################################################################################
