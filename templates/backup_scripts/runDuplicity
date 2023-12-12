@@ -39,6 +39,7 @@ function runDuplicity() {
           --encrypt-key "${GPG_KEY}" \
           --gpg-binary "/usr/bin/gpg2" \
           --log-file ${DUPLICITYLOG} \
+          "${IGNORE_PATHS:=''}" \
           "${SOURCE_DIRECTORY}" \
           "${DESTINATION_URL}" >> "${LOGFILE}"
 }
