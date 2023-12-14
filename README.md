@@ -99,6 +99,7 @@ some history then set it to the
 * CONTAINER -string - Name of the container to connect to ( when backing up
     content from a docker container)
 * DESTINATION_ROOT_DIR - Directory on remote to directs backups to (must and with a trailing slash)
+* IGNORE_PATHS - List of paths to ignore. Foe exaple to ifnore temp dir in the root of the backup: "--exclude **/temp"
 
 ## Checking backup chains
 PASSPHRASE="${GPG_PASSPHRASE}"    duplicity --encrypt-key "${GPG_KEY}" \
