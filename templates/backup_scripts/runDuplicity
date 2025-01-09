@@ -34,12 +34,11 @@ function runDuplicity() {
     RSYNC_PASSWORD="${PASSWORD}" rsync -a --recursive  "tmp/${BACKUP_NAME}" "${PROTO}://${USERNAME}@${SERVER}:${PORT}/${MODULE}" >> /dev/null
     rmdir "tmp/${BACKUP_NAME}"
   fi
-  PASSPHRASE="${GPG_PASSPHRASE}"    duplicity --full-if-older-than "${FULL_BACKUP_INTERVAL}" \
+  PASSPHRASE="${GPG_PASSPHRASE}"    duplicity incr --full-if-older-than "${FULL_BACKUP_INTERVAL}" \
           --num-retries 10 \
           --encrypt-key "${GPG_KEY}" \
-          --gpg-binary "/usr/bin/gpg2" \
+          --gpg-binary "{{ duplicity_gpg_binary }}" \
           --log-file ${DUPLICITYLOG} \
-          "${IGNORE_PATHS:=''}" \
           "${SOURCE_DIRECTORY}" \
           "${DESTINATION_URL}" >> "${LOGFILE}"
 }
@@ -49,7 +48,7 @@ function removeOldBackups() {
   PASSPHRASE="${GPG_PASSPHRASE}"    duplicity remove-all-but-n-full ${SETS_TO_KEEP} \
           --num-retries 10 \
           --encrypt-key "${GPG_KEY}" \
-          --gpg-binary "/usr/bin/gpg2" \
+          --gpg-binary "{{ duplicity_gpg_binary }}" \
           --force \
           --log-file ${DUPLICITYLOG} \
           ${DESTINATION_URL} >> "${LOGFILE}"

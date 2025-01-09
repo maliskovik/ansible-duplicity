@@ -1,4 +1,4 @@
 ---
 # Main role tasks file
 
-- include: duplicity.yml
+- ansible.builtin.include_tasks: duplicity.yml

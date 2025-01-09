@@ -49,7 +49,7 @@ function verifyBackups() {
     echo "Verifying ${BACKUP_NAME}: " | tee -a "${verify_logfile}"
     echo "" | tee -a "${verify_logfile}"
     PASSPHRASE="${GPG_PASSPHRASE}" duplicity verify  --encrypt-key "${GPG_KEY}" \
-                      --gpg-binary "/usr/bin/gpg2" \
+                      --gpg-binary "{{ duplicity_gpg_binary }}" \
                       "${DESTINATION_URL}" "${SOURCE_DIRECTORY}" | tee -a "${verify_logfile}"
   cat "${verify_logfile}" | sendmail "${MAIL_TO}"
   done
