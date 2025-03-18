@@ -1,0 +1,98 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+# Dumps remote *mysql database and runs duplicity backup on it.
+#
+##############################---INCLUDES---####################################
+
+. "${BACKUP_BACKEND}.cf"
+. ./runDuplicity
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+: ${DBHOST:="127.0.0.1"}
+#Missing variables are included from backupConfig
+SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+DESTINATION="${SOURCE_DIRECTORY}/${DATABASE}.sql"
+: ${REMOTE_MYSQL_PORT:="3306"}
+: ${LOCAL_SOCKET_PORT:="63003"}
+: ${REMOTE_USER:="root"}
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function prepareForBackup() {
+  echo " > Creating backup dir"
+  mkdir -p "${SOURCE_DIRECTORY}"
+  echo " > creating SSH socket"
+  ssh -L ${LOCAL_SOCKET_PORT}:localhost:${REMOTE_MYSQL_PORT} ${REMOTE_USER}@${REMOTE_HOST} -N &
+  export SSH_TUNNEL_PID=$!
+  sleep 3
+}
+
+function dumpMysql() {
+    if  [ -e ${SOURCE_DIRECTORY} ]
+    then
+        rm -fr ${SOURCE_DIRECTORY}
+    fi
+
+    mkdir -p ${SOURCE_DIRECTORY}
+
+    #Dump schema
+    mysqldump \
+        --no-data \
+        --skip-triggers \
+        --skip-routines \
+        --column-statistics=0 \
+        --host "${DBHOST}" \
+        --port "${LOCAL_SOCKET_PORT}" \
+        "${DATABASE}" > "${SOURCE_DIRECTORY}/db-schema-dump.sql"
+
+    #Dump processes
+    mysqldump \
+        --no-data \
+        --no-create-info \
+        --triggers \
+        --routines \
+        --skip-routines \
+        --column-statistics=0 \
+        --host "${DBHOST}" \
+        --port "${LOCAL_SOCKET_PORT}" \
+        "${DATABASE}" > "${SOURCE_DIRECTORY}/db-proc-dump.sql"
+
+    #Dump data
+    mysqldump \
+        --no-create-info \
+        --skip-triggers \
+        --column-statistics=0 \
+        --host "${DBHOST}" \
+        --port "${LOCAL_SOCKET_PORT}" \
+        "${DATABASE}" > "${SOURCE_DIRECTORY}/db-data-dump.sql"
+}
+
+function cleanup() {
+  rm -fr "${SOURCE_DIRECTORY}"
+  kill "${SSH_TUNNEL_PID}"
+  unset SSH_TUNNEL_PID
+}
+
+function runBackup() {
+    prepareForBackup
+    dumpMysql
+    runDuplicity
+    removeOldBackups
+    cleanup
+
+}
+
+################################################################################

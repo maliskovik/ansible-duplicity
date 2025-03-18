@@ -1,0 +1,3 @@
+{% for secret in duplicity_postgres_credentials %}
+{{ secret.hostname }}:{{ secret.port }}:{{ secret.database }}:{{ secret.username }}:{{ secret.password }}
+{% endfor %}

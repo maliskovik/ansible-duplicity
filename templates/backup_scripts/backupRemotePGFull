@@ -1,0 +1,75 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+# This script creates a full pg cluster dump to the destonation file.
+# The server establishes a ssh tunnel to a remote host and connects to the TCP
+# socket via the tunnel.
+#
+##############################---INCLUDES---####################################
+
+. "${BACKUP_BACKEND}.cf"
+. ./runDuplicity
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+: ${DBUSER:="postgres"}
+
+#Mising variables are included from backupConfig
+SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+DESTINATION="${SOURCE_DIRECTORY}/dump.sql"
+: ${PG_REPLICATION:="false"}
+: ${REMOTE_POSTGRES_PORT:="5432"}
+: ${LOCAL_SOCKET_PORT:="63333"}
+: ${REMOTE_USER:="root"}
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function prepareForBackup() {
+  echo " > Creating backup dir"
+  mkdir -p "${SOURCE_DIRECTORY}"
+  echo " > creating SSH socket ${REMOTE_HOST}:${REMOTE_POSTGRES_PORT} -> localhost:${LOCAL_SOCKET_PORT}"
+  ssh -L ${LOCAL_SOCKET_PORT}:localhost:${REMOTE_POSTGRES_PORT} ${REMOTE_USER}@${REMOTE_HOST} -N &
+  export SSH_TUNNEL_PID=$!
+  sleep 3
+  if [ $PG_REPLICATION == "true" ]
+  then
+    echo " > Disabling postgres replication"
+    psql -U "${DBUSER}" -p "${LOCAL_SOCKET_PORT}" -h 127.0.0.1 -c "select pg_wal_replay_pause();" postgres > /dev/null
+  fi
+}
+
+function connectAndDump() {
+  echo " > Dumping database"
+  pg_dumpall -U "${DBUSER}" -p "${LOCAL_SOCKET_PORT}" -h 127.0.0.1 > "${DESTINATION}"
+}
+
+function cleanup() {
+  if [ $PG_REPLICATION == "true" ]
+  then
+    psql -U "${DBUSER}" -p "${LOCAL_SOCKET_PORT}" -h 127.0.0.1 -c "select pg_wal_replay_resume();" postgres > /dev/null
+  fi
+  rm -fr "${SOURCE_DIRECTORY}"
+  kill "${SSH_TUNNEL_PID}"
+  unset SSH_TUNNEL_PID
+}
+
+function runBackup() {
+  prepareForBackup
+  connectAndDump
+  runDuplicity
+  removeOldBackups
+  cleanup
+}
+
+################################################################################

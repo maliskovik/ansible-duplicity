@@ -1,0 +1,91 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+# This script creates a full pg cluster dump to the destonation file.
+# In this instance the postgresql is expected to run on a remote host and is 
+# reachable via a local unix socker.
+#
+##############################---INCLUDES---####################################
+
+. "${BACKUP_BACKEND}.cf"
+. ./runDuplicity
+
+################################################################################
+
+##############################---VARIABLES---###################################
+
+: ${DBUSER:="postgres"}
+
+#Mising variables are included from backupConfig
+SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+DESTINATION="${SOURCE_DIRECTORY}/dump.sql"
+: ${PG_REPLICATION:="false"}
+: ${LOCAL_SOCKET_DIR:="/tmp/tmp_socket"}
+: ${SOCKET_NAME:="socket"}
+: ${REMOTE_USER:="root"}
+LOCAL_SOCKET_PATH="${LOCAL_SOCKET_DIR}/${SOCKET_NAME}"
+REMOTE_SOCKET_PATH="${REMOTE_SOCKET_DIR}/${SOCKET_NAME}"
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function prepareForBackup() {
+  echo " > Creating backup dir"
+  mkdir -p "${SOURCE_DIRECTORY}"
+  echo " > Creating socket directory"
+  mkdir -p "${LOCAL_SOCKET_DIR}"
+  echo " > Checking for existing socket"
+  if [ -S "${LOCAL_SOCKET_PATH}" ]
+  then
+    echo " > Removing existing socket"
+    rm -f "${LOCAL_SOCKET_PATH}"
+  fi
+  echo " > Creating SSH socket"
+  ssh -L ${LOCAL_SOCKET_PATH}:${REMOTE_SOCKET_PATH} -N ${REMOTE_USER}@${REMOTE_HOST} &
+  export SSH_TUNNEL_PID=$!
+  sleep 3
+  if [ $PG_REPLICATION == "true" ]
+  then
+    echo " > Disabling postgres replication"
+    psql -U "${DBUSER}" -h ${LOCAL_SOCKET_DIR} -c "select pg_wal_replay_pause();" postgres > /dev/null
+  fi
+}
+
+function connectAndDump() {
+  echo " > Dumping database"
+  pg_dumpall -U "${DBUSER}" -h ${LOCAL_SOCKET_DIR} > "${DESTINATION}"
+}
+
+function cleanup() {
+  if [ $PG_REPLICATION == "true" ]
+  then
+    psql -U "${DBUSER}" -h ${LOCAL_SOCKET_DIR} -c "select pg_wal_replay_resume();" postgres > /dev/null
+  fi
+  echo " > Removign backup directory"
+  rm -fr "${SOURCE_DIRECTORY}"
+  echo " > Terminating SSN tunnel"
+  kill "${SSH_TUNNEL_PID}"
+  unset SSH_TUNNEL_PID
+  echo " > Removing socket file"
+  rm -f "${LOCAL_SOCKET_PATH}"
+  echo " > Removing socket directory"
+  rmdir "${LOCAL_SOCKET_DIR}"
+}
+
+function runBackup() {
+  prepareForBackup
+  connectAndDump
+  runDuplicity
+  removeOldBackups
+  cleanup
+}
+
+################################################################################

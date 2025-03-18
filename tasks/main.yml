@@ -1,4 +1,8 @@
 ---
 # Main role tasks file
 
-- ansible.builtin.include_tasks: duplicity.yml
+- ansible.builtin.include_tasks: active_setup.yml
+  when: duplicity_role == "active"
+
+- ansible.builtin.include_tasks: backend_setup.yml
+  when: duplicity_role == "passive"

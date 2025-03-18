@@ -1,0 +1,24 @@
+---
+
+- name: Remove backup directory
+  file:
+    path: "{{ backup_directory }}"
+    owner: root
+    group: root
+    mode: 0755
+    state: absent
+
+- name: Remove backup cronjob
+  file:
+    path: "{{ duplicity_cronjob_file }}"
+    owner: root
+    group: root
+    mode: 0755
+    state: absent
+
+- name: Set agent authorized keys
+  authorized_key:
+    user: root
+    key: "{{ lookup('file', item) }}"
+  with_items: "{{ duplicity_agent_keys }}"
+  when: duplicity_agent_keys is defined

@@ -1,0 +1,44 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+# Back up a remote samba share with duplicity
+#
+##############################---INCLUDES---####################################
+
+. "${BACKUP_BACKEND}.cf"
+. ./runDuplicity
+
+################################################################################
+
+##############################---FUNCTIONS---###################################
+
+function prep_for_backup() {
+    echo " > Creating temporary mount directory"
+    export SOURCE_DIRECTORY="${BASE_MOUNT_DIR}/${BACKUP_NAME}"
+    mkdir -p "${SOURCE_DIRECTORY}"
+    echo " > Mounting remote directory"
+    mount -t cifs -o ro,vers=3.0,credentials=${BACKUP_BACKEND}.cf //${REMOTE_HOST}/REMOTE_SOURCE_DIRECTORY "${SOURCE_DIRECTORY}"
+}
+
+function after_backup_cleanup() {
+    echo " > Cleaning up"
+    echo " > Unmounting remote directory"
+    umount "${SOURCE_DIRECTORY}"
+    unset SOURCE_DIRECTORY
+}
+
+function runBackup() {
+    prep_for_backup
+    runDuplicity
+    removeOldBackups
+    after_backup_cleanup
+}
+
+################################################################################

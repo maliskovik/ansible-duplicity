@@ -6,25 +6,6 @@
 
   when: ansible_os_family == "Debian"
 
-- name: remove apt paramiko
-  apt:
-    name: python3-paramiko
-    state: absent
-  when:
-    - ansible_os_family == "Debian"
-    - ansible_lsb.id == "Ubuntu"
-    - ansible_lsb.major_release|int >= 18
-
-- name: Install python paramiko
-  pip:
-    name: paramiko
-    state: latest
-    executable: pip3
-  when:
-    - ansible_os_family == "Debian"
-    - ansible_lsb.id == "Ubuntu"
-    - ansible_lsb.major_release|int >= 18
-
 - name: Install duplicity -arch
   pacman:
     name: "{{ duplicity_arch_packages }}"
@@ -117,7 +98,7 @@
 - name: Add duplicity cronjob
   template:
     src: cron_job
-    dest: /etc/cron.d/duplicity
+    dest: "{{ duplicity_cronjob_file }}"
     mode: 0644
     owner: root
     group: root
@@ -129,3 +110,12 @@
     mode: 0644
     owner: root
     group: root
+
+- name: Set postgresql credentials
+  template:
+    src: pgpass
+    dest: /root/.pgpass
+    mode: 0600
+    owner: root
+    group: root
+  when: duplicity_postgres_credentials is defined

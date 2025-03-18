@@ -57,6 +57,7 @@ DESTINATION_URL="${PROTO}://${USERNAME}:${PASSWORD}@${SERVER}:${PORT}::/${MODULE
 DESTINATION_URL="${PROTO}://${USERNAME}@${SERVER}:${PORT}/${DESTINATION_ROOT_DIR}${BACKUP_NAME}"
 {% endif %}
 {% endif %}
+BASE_MOUNT_DIR="{{ duplicity_base_mount_dir }}"
 
 ################################################################################
 

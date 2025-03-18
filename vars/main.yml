@@ -2,6 +2,8 @@ duplicity_ubuntu_packages:
     - duplicity
     - gnupg
     - gnupg2
+    - python3-paramiko
+    - sshfs
 
 duplicity_centos_packages:
   - duplicity
@@ -12,3 +14,5 @@ duplicity_arch_packages:
   - gnupg
   - python-paramiko
   - python2-paramiko
+
+duplicity_cronjob_file: "/etc/cron.d/duplicity"
