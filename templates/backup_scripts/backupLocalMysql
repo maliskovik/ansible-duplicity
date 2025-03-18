@@ -20,6 +20,7 @@
 ##############################---VARIABLES---###################################
 
 : ${DBHOST:="127.0.0.1"}
+: ${DBPORT:="3306"}
 #Missing variables are included from backupConfig
 SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
 DESTINATION="${SOURCE_DIRECTORY}/${DATABASE}.sql"
@@ -42,6 +43,7 @@ function dumpMysql() {
         --skip-triggers \
         --skip-routines \
         --host "${DBHOST}" \
+        --port "${DBPORT}" \
         "${DATABASE}" > "${SOURCE_DIRECTORY}/db-schema-dump.sql"
 
     #Dump processes
@@ -52,6 +54,7 @@ function dumpMysql() {
         --routines \
         --skip-routines \
         --host "${DBHOST}" \
+        --port "${DBPORT}" \
         "${DATABASE}" > "${SOURCE_DIRECTORY}/db-proc-dump.sql"
 
     #Dump data
@@ -59,6 +62,7 @@ function dumpMysql() {
         --no-create-info \
         --skip-triggers \
         --host "${DBHOST}" \
+        --port "${DBPORT}" \
         "${DATABASE}" > "${SOURCE_DIRECTORY}/db-data-dump.sql"
 }
 

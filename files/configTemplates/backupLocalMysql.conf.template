@@ -18,6 +18,8 @@ SOURCE_DIRECTORY="<Directory to backup>"
 FULL_BACKUP_INTERVAL="<Interval of full backups>"
 BACKUP_INTERVAL=<Interval of backups>
 SETS_TO_KEEP=<Number of sets to keep>
+PORT=3306
+DATABASE=<database name>
 
 ################################################################################
 
