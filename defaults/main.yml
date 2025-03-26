@@ -8,3 +8,5 @@ duplicity_mail_to: ""
 duplicity_test_backups: False
 duplicity_base_mount_dir: "/mnt/duplicity"
 duplicity_role: "active"
+duplciity_secrets_postgresql_path: /root/.pgpass
+duplicity_gpg_binary: /usr/bin/gpg2

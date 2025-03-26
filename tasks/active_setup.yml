@@ -87,6 +87,16 @@
     mode: 0755
   with_fileglob: "templates/backup_scripts/*"
 
+- name: Copy custom scripts
+  template:
+    src: "{{ item }}"
+    dest: "{{ backup_directory }}"
+    owner: root
+    group: root
+    mode: 0755
+  when: duplicity_custom_backup_scripts is defined
+  with_items: "{{ duplicity_custom_backup_scripts| default(omit) }}"
+
 - name: Set backups
   copy:
     src: "configs/{{ inventory_hostname }}/duplicity_configs/"
@@ -111,11 +121,20 @@
     owner: root
     group: root
 
-- name: Set postgresql credentials
+- name: Set postgresql secrets
   template:
     src: pgpass
-    dest: /root/.pgpass
+    dest: "{{ duplciity_secrets_postgresql_path }}"
     mode: 0600
     owner: root
     group: root
   when: duplicity_postgres_credentials is defined
+
+- name: Set samba secrets
+  template:
+    src: samba_credentials
+    dest: "{{ item.path }}"
+    owner: "{{ item.owner| default('root') }}"
+    group: "{{ item.group| default('root') }}"
+  with_items: "{{ duplicity_secrets_samba }}"
+  when: duplicity_secrets_samba is defined

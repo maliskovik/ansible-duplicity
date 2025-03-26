@@ -166,3 +166,51 @@ You can save the password on the server in a config file of the user running the
 [client]
 password='my_very_secret_pass'
 ```
+
+## Secrets
+This role can set some secrets on the system
+Use vault for storing secrets then reference them.
+
+### SAMBA
+Samba credential fiels will be created if the following varriable is defined.:
+* duplicity_secrets_samba: List of objects
+  *
+    * path: path where to store this file
+    * user: Username
+    * password: Password
+    * domain: Domain (optional)
+    * owner: File owner (optional - defaults to root)
+    * group: File group (optional - defaults to root)
+
+Example content in the vars file:
+```
+duplicity_secrets_samba:
+  - path: /root/smb.cred
+    user: "{{ duplicity_samba_secret_user1 }}"
+    password: "{{ duplicity_samba_secret_pass1 }}"
+  - path: /var/www/smb.cred
+    user: "{{ dupliciy_samba_secret_user2 }}"
+    password: "{{ duplicity_samba_secret_pass2 }}"
+    domain: example.com
+    owner: www-data
+    group: www-data
+```
+Example secret of accompanying ansible vault file:
+```
+duplicity_samba_secret_user1: user1
+duplicity_samba_secret_pass1 <very secret password 1>
+dupliciy_samba_secret_user2: user1
+duplicity_samba_secret_pass2: <very secret password 2>
+```
+
+### Postgresql
+These credentials are all stored in one spot, so no need for setting path, user and group. They will be owned by root.
+
+* duplicity_secrets_postgres: List of object containing credentials.
+  *
+    * name: DB name
+    * hostname: Host name to connect to
+    * port: DB port
+    * database: Name of the database
+    * username: username for connection
+    * password: password for connection
