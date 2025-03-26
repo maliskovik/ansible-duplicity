@@ -1,13 +1,14 @@
 duplicity_ubuntu_packages:
-    - duplicity
-    - gnupg
-    - gnupg2
-    - python3-paramiko
-    - sshfs
+  - duplicity
+  - gnupg
+  - gnupg2
+  - python3-paramiko
+  - sshfs
 
 duplicity_centos_packages:
   - duplicity
   - python-paramiko
+  - pinentry
 
 duplicity_arch_packages:
   - duplicity

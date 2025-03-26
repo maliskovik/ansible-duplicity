@@ -11,7 +11,6 @@ The backups configs should be placed in files/backupConfigs/<hostname>
   * address - backend address
   * port- backend port
   * proto - protocol to use(sftp/rsync...)
-
 ## Optional variables
 
 * backup_directory - directory with all the backup configs
@@ -24,6 +23,7 @@ The backups configs should be placed in files/backupConfigs/<hostname>
   * address - backend address
   * port- backend port
   * proto - protocol to use(sftp/rsync...)
+* duplicity_role: Active or passive Active for default.
 
 # Setting up GPG key
 
