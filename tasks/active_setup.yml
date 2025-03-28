@@ -136,5 +136,16 @@
     dest: "{{ item.path }}"
     owner: "{{ item.owner| default('root') }}"
     group: "{{ item.group| default('root') }}"
+    mode: "{{ item.mode| default('0600') }}"
   with_items: "{{ duplicity_secrets_samba }}"
   when: duplicity_secrets_samba is defined
+
+- name: Set mysql secrets
+  template:
+    src: mysql_secrets
+    dest: "{{ item.path| default('/root/.my.cnf') }}"
+    owner: "{{ item.owner| default('root') }}"
+    group: "{{ item.group| default('root') }}"
+    mode: "{{ item.mode| default('0600') }}"
+  with_items: "{{ duplicity_secrets_mysql }}"
+  when: duplicity_secrets_mysql is defined

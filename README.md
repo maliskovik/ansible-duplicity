@@ -214,3 +214,15 @@ These credentials are all stored in one spot, so no need for setting path, user 
     * database: Name of the database
     * username: username for connection
     * password: password for connection
+
+### Mysql
+Mysql config is usually stored in the users home directory.
+
+* duplicity_secrets_mysql:
+  * 
+    * username: Default username to use
+    * password: Password to use
+    * dest: Where to put the secrets file - defaults to /root/.my.cnf
+    * group: group ownership of secrets file
+    * owner: owner of the secrets file
+    * mode: mode of the secrets file - default 0600
