@@ -128,7 +128,7 @@
     mode: 0600
     owner: root
     group: root
-  when: duplicity_postgres_credentials is defined
+  when: duplicity_secrets_mysql is defined
 
 - name: Set samba secrets
   template:
