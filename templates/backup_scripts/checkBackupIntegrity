@@ -23,7 +23,7 @@ MAIL_TO="{{ duplicity_mail_to }}"
 MAIL_FROM="{{ duplicity_mail_from }}"
 
 ################################################################################
-dffdf
+
 ###############################---WORKDIR---####################################
 
 cd $( dirname $0 )
@@ -32,35 +32,42 @@ cd $( dirname $0 )
 
 ##############################---FUNCTIONS---###################################
 
-function verifyBackups() {
-  rm -fr "${VERIFY_LOGDIR}"
-  mkdir -p "${VERIFY_LOGDIR}"
-  export TMPDIR=/storage/backup
+function verifyBackup_full() {
   for backup in *.conf
   do
-    unset DESTINATION_ROOT_DIR
-    . "./${backup}"
-    . "${BACKUP_BACKEND}.cf"
-    export PASSPHRASE="${GPG_PASSPHRASE}"
-    verify_logfile="${VERIFY_LOGDIR}/${BACKUP_NAME}"
-    echo "To: ${MAIL_TO}" > "${verify_logfile}"
-    echo "From: ${MAIL_FROM}" >> "${verify_logfile}"
-    echo "Subject: Verifying backup ${BACKUP_NAME}" >> "${verify_logfile}"
-    echo "Verifying ${BACKUP_NAME}: " | tee -a "${verify_logfile}"
-    echo "" | tee -a "${verify_logfile}"
-    PASSPHRASE="${GPG_PASSPHRASE}" duplicity verify  --encrypt-key "${GPG_KEY}" \
-                      --gpg-binary "{{ duplicity_gpg_binary }}" \
-                      "${DESTINATION_URL}" "${SOURCE_DIRECTORY}" | tee -a "${verify_logfile}"
-  cat "${verify_logfile}" | sendmail "${MAIL_TO}"
+    verifyBackup "${backup}"
   done
-  
-  exit ${BACKUP_STATUS}
+}
+
+function verifyBackup() {
+  backup=${1}
+  unset DESTINATION_ROOT_DIR
+  . "./${backup}"
+  . "${BACKUP_BACKEND}.cf"
+  export PASSPHRASE="${GPG_PASSPHRASE}"
+  verify_logfile="${VERIFY_LOGDIR}/${BACKUP_NAME}"
+  PASSPHRASE="${GPG_PASSPHRASE}" duplicity verify  --encrypt-key "${GPG_KEY}" \
+                  --gpg-binary "{{ duplicity_gpg_binary }}" \
+                   "${DESTINATION_URL}" "${TMPDIR}/${BACKUP_NAME}" | tee -a "${verify_logfile}"
+}
+
+function prep_env() {
+  rm -fr "${VERIFY_LOGDIR}"
+  mkdir -p "${VERIFY_LOGDIR}"
+  export TMPDIR=${TMPDIR:-/storage/backup/tmp}
+  mkdir -p "${TMPDIR}"
 }
 
 ################################################################################
 
 ###############################---EXECUTION---##################################
 
-verifyBackups
+prep_env
+if [ -z ${1} ]
+then
+  verifyBackup_full
+else
+  verifyBackup "${1}"
+fi
 
 ################################################################################

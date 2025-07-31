@@ -25,25 +25,53 @@ cd $( dirname $0 )
 
 ##############################---FUNCTIONS---###################################
 
-function chackForBackup() {
-  rm -fr "${VERIFY_LOGDIR}"
+function prep_env() {
+  echo " INFO: Preparing environment"
+  if [ -d "${VERIFY_LOGDIR}" ]; then
+    echo " INFO: Removing old log directory"
+    rm -fr "${VERIFY_LOGDIR}"
+  fi
+  echo " INFO: Creating log directory"
   mkdir -p "${VERIFY_LOGDIR}"
+}
+
+function checkForChains_full() {
   for backup in *.conf
   do
-    unset DESTINATION_ROOT_DIR
-    . "./${backup}"
-    . "${BACKUP_BACKEND}.cf"
-    export PASSPHRASE="${GPG_PASSPHRASE}"
-    echo "Collection status for ${BACKUP_NAME}: " | tee "${VERIFY_LOGDIR}/${BACKUP_NAME}"
-    duplicity collection-status $DESTINATION_URL | tee -a "${VERIFY_LOGDIR}/${BACKUP_NAME}"
+    checkForChains "${backup}"
   done
   exit ${BACKUP_STATUS}
+}
+
+function checkForChains() {
+  backup="${1}"
+  echo "INFO: Checking chains for ${backup}"
+  unset DESTINATION_ROOT_DIR
+  . "./${backup}"
+  . "${BACKUP_BACKEND}.cf"
+  export PASSPHRASE="${GPG_PASSPHRASE}"
+  echo "Collection status for ${BACKUP_NAME}: " | tee "${VERIFY_LOGDIR}/${BACKUP_NAME}"
+  duplicity collection-status $DESTINATION_URL | tee -a "${VERIFY_LOGDIR}/${BACKUP_NAME}"
+  unset PASSPHRASE
+}
+
+function cleanup_cc() {
+  echo " INFO: Cleaning up"
+  unset PASSPHRASE
+  unset DESTINATION_ROOT_DIR
 }
 
 ################################################################################
 
 ###############################---EXECUTION---##################################
 
-chackForBackup
+prep_env
+if [ -z $1 ]
+then
+  checkForChains_full
+else
+  checkForChains $1
+fi
+cleanup_cc
 
 ################################################################################

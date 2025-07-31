@@ -25,25 +25,46 @@ cd $( dirname $0 )
 
 ##############################---FUNCTIONS---###################################
 
-function chackForBackup() {
-  rm -fr "${VERIFY_LOGDIR}"
-  mkdir -p "${VERIFY_LOGDIR}"
+function checkFileLists() {
   for backup in *.conf
   do
-    unset DESTINATION_ROOT_DIR
-    . "./${backup}"
-    . "${BACKUP_BACKEND}.cf"
-    export PASSPHRASE="${GPG_PASSPHRASE}"
-    echo "Collection status for ${BACKUP_NAME}: " | tee "${VERIFY_LOGDIR}/${BACKUP_NAME}"
-    duplicity list-current-files $DESTINATION_URL | tee -a "${VERIFY_LOGDIR}/${BACKUP_NAME}"
+    checkFileList "${backup}"
   done
-  exit ${BACKUP_STATUS}
+  exit "${BACKUP_STATUS}"
+}
+
+function prep_env() {
+  if [ -d "${VERIFY_LOGDIR}" ]
+  then
+    echo " INFO: Cleaning up old logs"
+    rm -fr "${VERIFY_LOGDIR}"
+  fi
+  echo " INFO: Creating new logdir"
+  mkdir -p "${VERIFY_LOGDIR}"
+}
+
+function checkFileList() {
+  backup="${1}"
+  echo " INFO: Checking file list for ${backup}"
+  unset DESTINATION_ROOT_DIR
+  . "./${backup}"
+  . "${BACKUP_BACKEND}.cf"
+  export PASSPHRASE="${GPG_PASSPHRASE}"
+  echo "Collection status for ${BACKUP_NAME}: " | tee "${VERIFY_LOGDIR}/${BACKUP_NAME}"
+  duplicity list-current-files $DESTINATION_URL | tee -a "${VERIFY_LOGDIR}/${BACKUP_NAME}"
+  unset PASSPHRASE
 }
 
 ################################################################################
 
 ###############################---EXECUTION---##################################
 
-chackForBackup
+prep_env
+if [ -z ${1} ]
+then
+  checkFileLists
+else
+  checkFileList "${1}"
+fi
 
 ################################################################################

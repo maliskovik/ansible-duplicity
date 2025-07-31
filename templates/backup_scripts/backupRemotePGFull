@@ -22,9 +22,10 @@
 ##############################---VARIABLES---###################################
 
 : ${DBUSER:="postgres"}
+: ${TMPDIR:=${BACKUPDIR}}
 
 #Mising variables are included from backupConfig
-SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+SOURCE_DIRECTORY="${TMPDIR}/${BACKUP_NAME}"
 DESTINATION="${SOURCE_DIRECTORY}/dump.sql"
 : ${PG_REPLICATION:="false"}
 : ${REMOTE_POSTGRES_PORT:="5432"}

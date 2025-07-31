@@ -20,8 +20,10 @@
 ##############################---VARIABLES---###################################
 
 : ${DBHOST:="127.0.0.1"}
+: ${TMPDIR:=${BACKUPDIR}}
+
 #Missing variables are included from backupConfig
-SOURCE_DIRECTORY="${BACKUPDIR}/${BACKUP_NAME}"
+SOURCE_DIRECTORY="${TMPDIR}/${BACKUP_NAME}"
 DESTINATION="${SOURCE_DIRECTORY}/${DATABASE}.sql"
 : ${REMOTE_MYSQL_PORT:="3306"}
 : ${LOCAL_SOCKET_PORT:="63003"}
